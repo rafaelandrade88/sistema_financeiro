@@ -229,41 +229,6 @@ html, body {
 .btn-primary:hover { opacity: .88; transform: translateY(-1px); }
 .btn-primary:active { transform: translateY(0); }
 
-.login-divider {
-  display: flex; align-items: center; gap: 12px;
-  margin: 20px 0;
-  color: var(--text-3); font-size: 12px;
-}
-
-.login-divider::before, .login-divider::after {
-  content: ''; flex: 1;
-  height: 1px; background: var(--border);
-}
-
-.sso-grid {
-  display: grid; grid-template-columns: repeat(3,1fr); gap: 8px;
-  margin-bottom: 24px;
-}
-
-.sso-btn {
-  display: flex; align-items: center; justify-content: center; gap: 6px;
-  padding: 10px;
-  background: var(--bg-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-size: 12px; font-weight: 500;
-  color: var(--text-2);
-  cursor: pointer;
-  transition: var(--transition);
-}
-
-.sso-btn:hover {
-  border-color: var(--border-hover);
-  color: var(--text-1);
-  transform: translateY(-1px);
-}
-
-.sso-icon { font-size: 16px; }
 
 /* ===== MAIN APP ===== */
 #app {
@@ -944,7 +909,6 @@ html, body {
   .kpi-grid { grid-template-columns: 1fr; }
   .kpi-value { font-size: 22px; }
   .login-box { padding: 32px 24px; }
-  .sso-grid { grid-template-columns: 1fr; }
 }
 
 /* ===== CHART CANVAS HEIGHTS ===== */
@@ -988,19 +952,7 @@ html, body {
       </div>
       <button class="btn btn-primary" onclick="doLogin()">✦ Entrar no Sistema</button>
 
-      <div class="login-divider">ou entre com</div>
 
-      <div class="sso-grid">
-        <div class="sso-btn" onclick="doSSO('Google')">
-          <span class="sso-icon">🔵</span> Google
-        </div>
-        <div class="sso-btn" onclick="doSSO('Microsoft')">
-          <span class="sso-icon">🟦</span> Outlook
-        </div>
-        <div class="sso-btn" onclick="doSSO('Facebook')">
-          <span class="sso-icon">🔷</span> Facebook
-        </div>
-      </div>
     </div>
 
     <!-- REGISTER FORM -->
@@ -1948,13 +1900,6 @@ function doLogin() {
   enterApp(user);
 }
 
-function doSSO(provider) {
-  const demoUser = DB.users[0];
-  DB.currentUser = demoUser;
-  saveDB(DB);
-  showNotif(`Login com ${provider} realizado (demo)!`, '✅');
-  setTimeout(() => enterApp(demoUser), 800);
-}
 
 function doRegister() {
   const name = document.getElementById('reg-name').value.trim();

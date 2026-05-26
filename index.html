@@ -955,6 +955,17 @@ html, body {
 
     </div>
 
+    <!-- AGUARDANDO APROVAÇÃO -->
+    <div id="tab-aguardando" style="display:none;text-align:center;padding:20px 0">
+      <div style="font-size:52px;margin-bottom:16px">⏳</div>
+      <div style="font-family:var(--font-display);font-size:20px;font-weight:700;margin-bottom:8px;color:var(--text-1)">Cadastro enviado!</div>
+      <div style="font-size:13px;color:var(--text-2);line-height:1.6;margin-bottom:24px">
+        Seu cadastro foi recebido e está <strong style="color:var(--warning)">aguardando aprovação</strong> do administrador.<br>
+        Assim que aprovado, você poderá fazer login normalmente.
+      </div>
+      <button class="btn btn-outline" style="width:100%" onclick="voltarLogin()">← Voltar ao Login</button>
+    </div>
+
     <!-- REGISTER FORM -->
     <div id="tab-register" style="display:none">
       <div class="form-group">
@@ -1057,7 +1068,10 @@ html, body {
       </div>
       <div class="nav-sub" id="sub-config">
         <div class="nav-sub-item" onclick="navigate('config-tema')">Tema Claro / Escuro</div>
-        <div class="nav-sub-item" onclick="navigate('config-usuarios')">Cadastrar Usuários</div>
+        <div class="nav-sub-item" onclick="navigate('config-usuarios')" style="justify-content:space-between">
+          <span>Cadastrar Usuários</span>
+          <span id="badge-pendentes" style="display:none;background:var(--danger);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;min-width:18px;text-align:center"></span>
+        </div>
         <div class="nav-sub-item" onclick="navigate('config-senha')">Alterar Senha</div>
         <div class="nav-sub-item" style="color:var(--danger)" onclick="doLogout()">Sair do App</div>
       </div>
@@ -1781,7 +1795,7 @@ function initDB() {
 
   const db = {
     users: [
-      { id: 'u1', name: 'Admin', email: 'admin@financeflow.app', pass: hashPass('admin123'), role: 'admin', isAdmin: true, primeiroAcesso: false }
+      { id: 'u1', name: 'Admin', email: 'admin@financeflow.app', pass: hashPass('admin123'), role: 'admin', isAdmin: true, primeiroAcesso: false, status: 'aprovado' }
     ],
     currentUser: null,
     lancamentos,
@@ -1881,6 +1895,21 @@ function sum(list) {
 /* ===============================
    LOGIN / AUTH
 ================================ */
+function atualizarBadgePendentes() {
+  const pendentes = DB.users.filter(u => u.status === 'pendente').length;
+  const badge = document.getElementById('badge-pendentes');
+  if (badge) {
+    badge.textContent = pendentes;
+    badge.style.display = pendentes > 0 ? 'inline-block' : 'none';
+  }
+}
+
+function voltarLogin() {
+  document.getElementById('tab-aguardando').style.display = 'none';
+  document.querySelectorAll('.login-tab').forEach(t => t.style.display = '');
+  switchLoginTab('login');
+}
+
 function switchLoginTab(tab) {
   document.getElementById('tab-login').style.display = tab==='login' ? 'block' : 'none';
   document.getElementById('tab-register').style.display = tab==='register' ? 'block' : 'none';
@@ -1895,9 +1924,27 @@ function doLogin() {
   if (!email || !pass) { showNotif('Preencha e-mail e senha','⚠️'); return; }
   const user = DB.users.find(u => u.email===email && u.pass===hashPass(pass));
   if (!user) { showNotif('E-mail ou senha incorretos','❌'); return; }
+  if (user.status === 'pendente') {
+    showNotif('⏳ Seu cadastro aguarda aprovação do administrador.', '⏳');
+    return;
+  }
+  if (user.status === 'rejeitado') {
+    showNotif('❌ Seu acesso foi negado pelo administrador.', '❌');
+    return;
+  }
   DB.currentUser = user;
   saveDB(DB);
-  enterApp(user);
+  if (user.primeiroAcesso) {
+    enterApp(user);
+    setTimeout(() => {
+      DB._forceSenha = true;
+      saveDB(DB);
+      navigate('config-senha');
+      showNotif('⚠️ Troque sua senha antes de continuar!', '🔒');
+    }, 400);
+  } else {
+    enterApp(user);
+  }
 }
 
 
@@ -1910,12 +1957,14 @@ function doRegister() {
   if (pass.length < 6) { showNotif('Senha mínima 6 caracteres','⚠️'); return; }
   if (pass !== pass2) { showNotif('As senhas não coincidem','❌'); return; }
   if (DB.users.find(u => u.email===email)) { showNotif('E-mail já cadastrado','⚠️'); return; }
-  const user = { id: uid(), name, email, pass: hashPass(pass), role: 'comum', isAdmin: false, primeiroAcesso: false };
+  const user = { id: uid(), name, email, pass: hashPass(pass), role: 'comum', isAdmin: false, primeiroAcesso: true, status: 'pendente', cadastradoEm: new Date().toISOString() };
   DB.users.push(user);
-  DB.currentUser = user;
   saveDB(DB);
-  showNotif('Conta criada! Bem-vindo(a) 🎉','✅');
-  setTimeout(() => enterApp(user), 800);
+  // Mostrar tela de aguardando aprovação
+  document.getElementById('tab-register').style.display = 'none';
+  document.getElementById('tab-login').style.display = 'none';
+  document.querySelectorAll('.login-tab').forEach(t => t.style.display = 'none');
+  document.getElementById('tab-aguardando').style.display = 'block';
 }
 
 function enterApp(user) {
@@ -1935,6 +1984,7 @@ function enterApp(user) {
 
   populateCatSelects();
   initSidebarOpen();
+  atualizarBadgePendentes();
   navigate('visao-geral');
 }
 
@@ -2753,13 +2803,55 @@ function renderUsers() {
   const el = document.getElementById('users-list');
   if (!el) return;
   const isCurrentAdmin = DB.currentUser?.isAdmin === true;
-  el.innerHTML = DB.users.map(u => {
+
+  // Atualiza badge de pendentes na sidebar
+  const pendentes = DB.users.filter(u => u.status === 'pendente');
+  const badge = document.getElementById('badge-pendentes');
+  if (badge) {
+    badge.textContent = pendentes.length;
+    badge.style.display = pendentes.length > 0 ? 'inline-block' : 'none';
+  }
+
+  // Separar pendentes dos aprovados
+  const aprovados = DB.users.filter(u => u.status !== 'pendente');
+
+  let html = '';
+
+  // Seção de pendentes
+  if (pendentes.length > 0 && isCurrentAdmin) {
+    html += `<div style="margin-bottom:20px">
+      <div style="font-size:12px;font-weight:600;color:var(--warning);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;display:flex;align-items:center;gap:6px">
+        <span>⏳</span> Aguardando Aprovação (${pendentes.length})
+      </div>`;
+    html += pendentes.map(u => {
+      const dt = u.cadastradoEm ? new Date(u.cadastradoEm).toLocaleDateString('pt-BR') : '—';
+      return `
+        <div class="user-row" style="background:rgba(255,176,58,.06);border:1px solid rgba(255,176,58,.2);border-radius:10px;padding:12px 14px;margin-bottom:8px">
+          <div class="user-avatar" style="width:38px;height:38px;font-size:13px;flex-shrink:0;background:linear-gradient(135deg,var(--warning),#ff9a00)">${u.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)}</div>
+          <div style="flex:1">
+            <div style="font-size:14px;font-weight:500;color:var(--text-1)">${u.name}</div>
+            <div style="font-size:12px;color:var(--text-2)">${u.email}</div>
+            <div style="font-size:11px;color:var(--text-3);margin-top:2px">Cadastrado em ${dt}</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-shrink:0">
+            <button class="btn btn-accent" style="padding:6px 14px;font-size:12px" onclick="aprovarUser('${u.id}')">✅ Aprovar</button>
+            <button class="btn btn-danger" style="padding:6px 14px;font-size:12px" onclick="rejeitarUser('${u.id}')">❌ Rejeitar</button>
+          </div>
+        </div>`;
+    }).join('');
+    html += '</div>';
+  }
+
+  // Seção de usuários aprovados
+  html += `<div style="font-size:12px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">👥 Usuários Ativos (${aprovados.length})</div>`;
+  html += aprovados.map(u => {
     const isSelf = u.id === DB.currentUser?.id;
     const isProtectedAdmin = u.isAdmin === true;
     const roleLabel = isProtectedAdmin ? '👑 Admin' : '👤 Comum';
     const badgeClass = isProtectedAdmin ? 'badge-info' : 'badge-default';
     const statusBadge = isSelf ? '<span class="badge badge-success">Você</span>' : '';
     const primeiroBadge = u.primeiroAcesso ? '<span class="badge badge-warning" style="font-size:10px;margin-left:6px">1º acesso</span>' : '';
+    const rejeitadoBadge = u.status === 'rejeitado' ? '<span class="badge badge-danger" style="font-size:10px;margin-left:6px">Rejeitado</span>' : '';
     const resetBtn = isCurrentAdmin && !isSelf ? `<button class="btn btn-outline" style="padding:4px 10px;font-size:11px" onclick="resetarSenhaUser('${u.id}')">🔑 Reset</button>` : '';
     const toggleRoleBtn = isCurrentAdmin && !isSelf && !isProtectedAdmin ? `<button class="btn btn-outline" style="padding:4px 10px;font-size:11px" onclick="toggleRole('${u.id}')">${u.role==='comum'?'↑ Promover':'↓ Rebaixar'}</button>` : '';
     const deleteBtn = isCurrentAdmin && !isSelf && !isProtectedAdmin ? `<button class="btn btn-danger" style="padding:4px 10px;font-size:11px" onclick="removerUser('${u.id}')">✕</button>` : '';
@@ -2767,15 +2859,36 @@ function renderUsers() {
       <div class="user-row">
         <div class="user-avatar" style="width:38px;height:38px;font-size:13px;flex-shrink:0">${u.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)}</div>
         <div style="flex:1">
-          <div style="font-size:14px;font-weight:500;color:var(--text-1)">${u.name}${primeiroBadge}</div>
+          <div style="font-size:14px;font-weight:500;color:var(--text-1)">${u.name}${primeiroBadge}${rejeitadoBadge}</div>
           <div style="font-size:12px;color:var(--text-2)">${u.email}</div>
         </div>
         <span class="badge ${badgeClass}">${roleLabel}</span>
         ${statusBadge}${toggleRoleBtn}${resetBtn}${deleteBtn}
-      </div>
-    `;
+      </div>`;
   }).join('');
+
+  el.innerHTML = html;
 }
+function aprovarUser(id) {
+  const target = DB.users.find(u => u.id === id);
+  if (!target) return;
+  if (!DB.currentUser?.isAdmin) { showNotif('Apenas o admin pode aprovar!','⚠️'); return; }
+  target.status = 'aprovado';
+  saveDB(DB);
+  renderUsers();
+  showNotif('✅ ' + target.name + ' aprovado! Já pode fazer login.', '✅');
+}
+
+function rejeitarUser(id) {
+  const target = DB.users.find(u => u.id === id);
+  if (!target) return;
+  if (!DB.currentUser?.isAdmin) { showNotif('Apenas o admin pode rejeitar!','⚠️'); return; }
+  target.status = 'rejeitado';
+  saveDB(DB);
+  renderUsers();
+  showNotif('❌ Acesso de ' + target.name + ' negado.', '❌');
+}
+
 function removerUser(id) {
   const target = DB.users.find(u=>u.id===id);
   if (!target) return;

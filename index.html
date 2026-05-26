@@ -2,7 +2,7 @@
 <html lang="pt-BR" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>FinanceFlow — Controle Financeiro Familiar</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -60,7 +60,8 @@
   --text-3: #9499BE;
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+img, canvas, svg { max-width: 100%; }
 
 html, body {
   height: 100%;
@@ -445,7 +446,10 @@ html, body {
 .content {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 24px;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
 }
 
 /* ===== CARDS ===== */
@@ -878,37 +882,115 @@ html, body {
 }
 
 @media (max-width: 768px) {
-  :root { --sidebar-w: 280px; }
+  :root { --sidebar-w: 85vw; }
+
+  html, body { overflow-x: hidden; max-width: 100vw; }
 
   .sidebar {
     position: fixed; left: 0; top: 0; bottom: 0;
-    transform: translateX(-100%);
-    z-index: 100;
+    transform: translateX(-110%);
+    z-index: 200;
+    max-width: 320px;
   }
-
   .sidebar.open {
     transform: translateX(0);
-    box-shadow: 8px 0 32px rgba(0,0,0,.4);
+    box-shadow: 8px 0 40px rgba(0,0,0,.5);
   }
-
   .sidebar-overlay { display: none; }
-  .sidebar-overlay.open { display: block; }
-
+  .sidebar-overlay.open { display: block; z-index: 199; }
   .burger { display: flex; }
 
-  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .main { width: 100vw; max-width: 100vw; overflow-x: hidden; }
 
-  .content { padding: 16px; }
+  .topbar { padding: 0 12px; gap: 8px; height: 56px; }
+  .topbar-title { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; }
+  .topbar-right { gap: 6px; }
+  .topbar-btn { font-size: 12px; padding: 6px 10px; }
+  .period-selector { font-size: 12px; padding: 6px 8px; max-width: 130px; }
 
-  .topbar { padding: 0 16px; }
+  .content { padding: 12px; overflow-x: hidden; }
+  .card { padding: 14px; border-radius: var(--radius-md); overflow: hidden; }
 
-  .modal { padding: 24px 20px; }
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
+  .kpi-value { font-size: 20px; }
+  .kpi-label { font-size: 10px; }
+  .kpi-card { padding: 14px; }
+
+  .charts-grid { grid-template-columns: 1fr; gap: 12px; margin-bottom: 14px; }
+
+  .budget-hero { padding: 20px 14px; }
+
+  .form-row { grid-template-columns: 1fr; gap: 10px; }
+  .form-row-3 { grid-template-columns: 1fr; }
+
+  .modal-overlay { padding: 0; align-items: flex-end; }
+  .modal {
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    max-height: 92vh;
+    padding: 24px 18px 32px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Tabelas viram cards no mobile */
+  .data-table { display: block; width: 100%; }
+  .data-table thead { display: none; }
+  .data-table tbody { display: block; width: 100%; }
+  .data-table tr {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-2);
+    border-radius: var(--radius-md);
+    padding: 12px;
+    margin-bottom: 8px;
+    border: 1px solid var(--border);
+    gap: 2px;
+    width: 100%;
+  }
+  .data-table tr:hover td { background: transparent; color: var(--text-2); }
+  .data-table td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 0;
+    border-bottom: none;
+    font-size: 12px;
+    width: 100%;
+  }
+  .data-table td[style*="text-align:right"] { text-align: right; }
+
+  /* Login */
+  .login-box { padding: 28px 20px; }
+
+  /* Grids secoes */
+  #metas-grid { grid-template-columns: 1fr !important; }
+  #sec-simulador > div { grid-template-columns: 1fr !important; }
+  #sec-diagnostico > div { grid-template-columns: 1fr !important; }
+
+  /* Filtros lançamentos */
+  #sec-lancamentos > div:first-child { flex-direction: column; }
+  #sec-lancamentos > div:first-child input,
+  #sec-lancamentos > div:first-child select { max-width: 100% !important; width: 100%; }
+
+  /* User rows */
+  .user-row { flex-wrap: wrap; }
+
+  /* Notificação ocupa largura total */
+  .notif { right: 10px; left: 10px; max-width: unset; font-size: 12px; }
+
+  /* Charts altura menor */
+  #chartEvolution { height: 200px !important; }
+  #chartCategories { height: 180px !important; }
+  #chartMensal { height: 200px !important; }
+  #chartFormas { height: 180px !important; }
+  #chartOrcado { height: 200px !important; }
 }
 
-@media (max-width: 480px) {
-  .kpi-grid { grid-template-columns: 1fr; }
-  .kpi-value { font-size: 22px; }
-  .login-box { padding: 32px 24px; }
+@media (max-width: 420px) {
+  .kpi-grid { grid-template-columns: 1fr; gap: 8px; }
+  .kpi-value { font-size: 18px; }
+  .topbar-title { max-width: 110px; }
+  .card { padding: 12px; }
 }
 
 /* ===== CHART CANVAS HEIGHTS ===== */
@@ -1827,6 +1909,11 @@ function hashPass(p) {
   return h.toString(16);
 }
 
+function validarEmail(email) {
+  const re = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+  return re.test(email);
+}
+
 /* ===============================
    CATEGORIES CONFIG
 ================================ */
@@ -1954,6 +2041,7 @@ function doRegister() {
   const pass = document.getElementById('reg-pass').value;
   const pass2 = document.getElementById('reg-pass2').value;
   if (!name||!email||!pass) { showNotif('Preencha todos os campos','⚠️'); return; }
+  if (!validarEmail(email)) { showNotif('Informe um e-mail válido. Ex: nome@email.com','⚠️'); return; }
   if (pass.length < 6) { showNotif('Senha mínima 6 caracteres','⚠️'); return; }
   if (pass !== pass2) { showNotif('As senhas não coincidem','❌'); return; }
   if (DB.users.find(u => u.email===email)) { showNotif('E-mail já cadastrado','⚠️'); return; }
@@ -2089,9 +2177,22 @@ function renderSection(sec) {
     case 'lancamentos': renderLancamentos(); break;
     case 'config-usuarios': renderUsers(); break;
   }
+  setTimeout(injetarDataLabels, 50);
 }
 
 function refreshCharts() { renderSection(currentSection); }
+
+function injetarDataLabels() {
+  // Injeta data-label em cada td para o CSS mobile exibir o header
+  document.querySelectorAll('.data-table').forEach(table => {
+    const headers = [...table.querySelectorAll('thead th')].map(th => th.textContent.trim());
+    table.querySelectorAll('tbody tr').forEach(tr => {
+      [...tr.querySelectorAll('td')].forEach((td, i) => {
+        if (headers[i]) td.setAttribute('data-label', headers[i]);
+      });
+    });
+  });
+}
 
 function destroyCharts() {
   Object.values(chartInstances).forEach(c => { try { c.destroy(); } catch(e){} });
@@ -3046,6 +3147,7 @@ function cadastrarUsuario() {
   const role = document.getElementById('new-user-role').value;
 
   if (!name||!email||!pass) { showNotif('Preencha todos os campos','⚠️'); return; }
+  if (!validarEmail(email)) { showNotif('Informe um e-mail válido. Ex: nome@email.com','⚠️'); return; }
   if (DB.users.find(u=>u.email===email)) { showNotif('E-mail já cadastrado','⚠️'); return; }
 
   if (!DB.currentUser?.isAdmin) { showNotif('Apenas o admin pode cadastrar usuários!','⚠️'); return; }
@@ -3145,6 +3247,27 @@ window.addEventListener('DOMContentLoaded', () => {
   if (DB.currentUser) {
     enterApp(DB.currentUser);
   }
+
+  // Swipe para fechar sidebar no mobile
+  let touchStartX = 0;
+  document.addEventListener('touchstart', e => {
+    touchStartX = e.touches[0].clientX;
+  }, { passive: true });
+  document.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar && sidebar.classList.contains('open') && dx < -60) {
+      closeSidebar();
+    }
+  }, { passive: true });
+
+  // Previne zoom duplo toque em iOS
+  let lastTap = 0;
+  document.addEventListener('touchend', e => {
+    const now = Date.now();
+    if (now - lastTap < 300) e.preventDefault();
+    lastTap = now;
+  }, { passive: false });
 });
 </script>
 </body>

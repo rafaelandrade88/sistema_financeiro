@@ -1751,10 +1751,7 @@ html, body {
       </div>
       <div class="field">
         <label>Perfil</label>
-        <select id="new-user-role">
-          <option value="admin">Administrador</option>
-          <option value="viewer">Visualizador</option>
-        </select>
+        <input type="text" value="Comum (padrão)" disabled style="opacity:.5;cursor:not-allowed">
       </div>
     </div>
     <div class="modal-actions">
@@ -1832,7 +1829,7 @@ function initDB() {
 
   const db = {
     users: [
-      { id: 'u1', name: 'Admin', email: 'admin@financeflow.app', pass: hashPass('admin123'), role: 'admin' }
+      { id: 'u1', name: 'Admin', email: 'admin@financeflow.app', pass: hashPass('admin123'), role: 'admin', isAdmin: true, primeiroAcesso: false }
     ],
     currentUser: null,
     lancamentos,
@@ -1968,7 +1965,7 @@ function doRegister() {
   if (pass.length < 6) { showNotif('Senha mínima 6 caracteres','⚠️'); return; }
   if (pass !== pass2) { showNotif('As senhas não coincidem','❌'); return; }
   if (DB.users.find(u => u.email===email)) { showNotif('E-mail já cadastrado','⚠️'); return; }
-  const user = { id: uid(), name, email, pass: hashPass(pass), role: 'admin' };
+  const user = { id: uid(), name, email, pass: hashPass(pass), role: 'comum', isAdmin: false, primeiroAcesso: false };
   DB.users.push(user);
   DB.currentUser = user;
   saveDB(DB);
@@ -2014,8 +2011,10 @@ function alterarSenha() {
   if (nova.length < 6) { showNotif('Nova senha mínima 6 caracteres','⚠️'); return; }
   if (nova !== nova2) { showNotif('As senhas não coincidem','❌'); return; }
   user.pass = hashPass(nova);
+  user.primeiroAcesso = false;
+  DB._forceSenha = false;
   saveDB(DB);
-  showNotif('Senha alterada com sucesso!','✅');
+  showNotif('Senha alterada com sucesso! Agora você pode navegar livremente.','✅');
   document.getElementById('pwd-atual').value = '';
   document.getElementById('pwd-nova').value = '';
   document.getElementById('pwd-nova2').value = '';
@@ -2047,6 +2046,11 @@ let currentSection = 'visao-geral';
 let chartInstances = {};
 
 function navigate(sec) {
+  // Bloqueia navegacao se usuario precisa trocar senha
+  if (DB._forceSenha && sec !== 'config-senha') {
+    showNotif('⚠️ Troque sua senha antes de continuar!', '🔒');
+    sec = 'config-senha';
+  }
   currentSection = sec;
 
   // Update active nav
@@ -2803,26 +2807,62 @@ function populateCatFilter() {
 function renderUsers() {
   const el = document.getElementById('users-list');
   if (!el) return;
-  el.innerHTML = DB.users.map(u=>`
-    <div class="user-row">
-      <div class="user-avatar" style="width:38px;height:38px;font-size:13px;flex-shrink:0">${u.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)}</div>
-      <div style="flex:1">
-        <div style="font-size:14px;font-weight:500;color:var(--text-1)">${u.name}</div>
-        <div style="font-size:12px;color:var(--text-2)">${u.email}</div>
+  const isCurrentAdmin = DB.currentUser?.isAdmin === true;
+  el.innerHTML = DB.users.map(u => {
+    const isSelf = u.id === DB.currentUser?.id;
+    const isProtectedAdmin = u.isAdmin === true;
+    const roleLabel = isProtectedAdmin ? '👑 Admin' : '👤 Comum';
+    const badgeClass = isProtectedAdmin ? 'badge-info' : 'badge-default';
+    const statusBadge = isSelf ? '<span class="badge badge-success">Você</span>' : '';
+    const primeiroBadge = u.primeiroAcesso ? '<span class="badge badge-warning" style="font-size:10px;margin-left:6px">1º acesso</span>' : '';
+    const resetBtn = isCurrentAdmin && !isSelf ? `<button class="btn btn-outline" style="padding:4px 10px;font-size:11px" onclick="resetarSenhaUser('${u.id}')">🔑 Reset</button>` : '';
+    const toggleRoleBtn = isCurrentAdmin && !isSelf && !isProtectedAdmin ? `<button class="btn btn-outline" style="padding:4px 10px;font-size:11px" onclick="toggleRole('${u.id}')">${u.role==='comum'?'↑ Promover':'↓ Rebaixar'}</button>` : '';
+    const deleteBtn = isCurrentAdmin && !isSelf && !isProtectedAdmin ? `<button class="btn btn-danger" style="padding:4px 10px;font-size:11px" onclick="removerUser('${u.id}')">✕</button>` : '';
+    return `
+      <div class="user-row">
+        <div class="user-avatar" style="width:38px;height:38px;font-size:13px;flex-shrink:0">${u.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)}</div>
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:500;color:var(--text-1)">${u.name}${primeiroBadge}</div>
+          <div style="font-size:12px;color:var(--text-2)">${u.email}</div>
+        </div>
+        <span class="badge ${badgeClass}">${roleLabel}</span>
+        ${statusBadge}${toggleRoleBtn}${resetBtn}${deleteBtn}
       </div>
-      <span class="badge badge-${u.role==='admin'?'info':'default'}">${u.role==='admin'?'Admin':'Visualizador'}</span>
-      ${u.id !== DB.currentUser?.id ? `<button class="btn btn-danger" style="padding:4px 10px;font-size:11px" onclick="removerUser('${u.id}')">✕</button>` : '<span class="badge badge-success">Você</span>'}
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
-
 function removerUser(id) {
+  const target = DB.users.find(u=>u.id===id);
+  if (!target) return;
+  if (target.isAdmin) { showNotif('O administrador não pode ser removido!','🚧'); return; }
+  if (!DB.currentUser?.isAdmin) { showNotif('Apenas o admin pode remover usuários!','⚠️'); return; }
   DB.users = DB.users.filter(u=>u.id!==id);
   saveDB(DB);
   renderUsers();
   showNotif('Usuário removido','✅');
 }
 
+function toggleRole(id) {
+  const target = DB.users.find(u=>u.id===id);
+  if (!target || target.isAdmin) { showNotif('Não é possível alterar o perfil do admin','⚠️'); return; }
+  if (!DB.currentUser?.isAdmin) { showNotif('Apenas o admin pode alterar perfis!','⚠️'); return; }
+  target.role = target.role === 'comum' ? 'gerente' : 'comum';
+  saveDB(DB);
+  renderUsers();
+  showNotif('Perfil de ' + target.name + ' alterado para ' + target.role + '!','✅');
+}
+
+function resetarSenhaUser(id) {
+  const target = DB.users.find(u=>u.id===id);
+  if (!target) return;
+  if (!DB.currentUser?.isAdmin) { showNotif('Apenas o admin pode resetar senhas!','⚠️'); return; }
+  const novaSenha = 'Mudar@' + Math.floor(1000+Math.random()*9000);
+  target.pass = hashPass(novaSenha);
+  target.primeiroAcesso = true;
+  saveDB(DB);
+  renderUsers();
+  showNotif('Nova senha de ' + target.name + ': ' + novaSenha + ' — comunique ao usuário!', '🔑');
+}
 /* ===============================
    MODALS
 ================================ */
@@ -2950,10 +2990,11 @@ function cadastrarUsuario() {
   if (!name||!email||!pass) { showNotif('Preencha todos os campos','⚠️'); return; }
   if (DB.users.find(u=>u.email===email)) { showNotif('E-mail já cadastrado','⚠️'); return; }
 
-  DB.users.push({ id:uid(), name, email, pass:hashPass(pass), role });
+  if (!DB.currentUser?.isAdmin) { showNotif('Apenas o admin pode cadastrar usuários!','⚠️'); return; }
+  DB.users.push({ id:uid(), name, email, pass:hashPass(pass), role:'comum', isAdmin:false, primeiroAcesso:true });
   saveDB(DB);
   closeModal('modal-user');
-  showNotif('Usuário cadastrado com sucesso!','✅');
+  showNotif('Usuário ' + name + ' criado! Senha temporária: ' + pass,'✅');
   renderUsers();
 
   document.getElementById('new-user-name').value = '';

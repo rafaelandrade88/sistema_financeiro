@@ -78,11 +78,7 @@ html, body {
 
 /* ===== LOGIN PAGE ===== */
 #login-page {
-  position: fixed; inset: 0;
-  background: var(--bg-0);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 1000;
-  overflow: hidden;
+  display: none !important;
 }
 
 .login-bg {
@@ -3244,9 +3240,12 @@ function showNotif(msg, icon='✅') {
    AUTO-LOGIN (check stored session)
 ================================ */
 window.addEventListener('DOMContentLoaded', () => {
-  if (DB.currentUser) {
-    enterApp(DB.currentUser);
-  }
+  // Login temporariamente desativado — entra direto como admin
+  const adminUser = DB.users.find(u => u.isAdmin === true) || DB.users[0];
+  DB.currentUser = adminUser;
+  saveDB(DB);
+  enterApp(adminUser);
+  if (false) {
 
   // Swipe para fechar sidebar no mobile
   let touchStartX = 0;

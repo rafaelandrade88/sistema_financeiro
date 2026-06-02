@@ -78,7 +78,11 @@ html, body {
 
 /* ===== LOGIN PAGE ===== */
 #login-page {
-  display: none !important;
+  position: fixed; inset: 0;
+  background: var(--bg-0);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+  overflow: hidden;
 }
 
 .login-bg {
@@ -1027,6 +1031,10 @@ html, body {
       <div class="form-group">
         <label class="form-label">Senha</label>
         <input class="form-input" type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+        <input type="checkbox" id="lembrar-me" style="width:16px;height:16px;accent-color:var(--accent);cursor:pointer">
+        <label for="lembrar-me" style="font-size:13px;color:var(--text-2);cursor:pointer;user-select:none">Lembrar de mim</label>
       </div>
       <button class="btn btn-primary" onclick="doLogin()">✦ Entrar no Sistema</button>
 
@@ -2004,6 +2012,7 @@ function switchLoginTab(tab) {
 function doLogin() {
   const email = document.getElementById('login-email').value.trim();
   const pass = document.getElementById('login-pass').value;
+  const lembrar = document.getElementById('lembrar-me')?.checked || false;
   if (!email || !pass) { showNotif('Preencha e-mail e senha','⚠️'); return; }
   const user = DB.users.find(u => u.email===email && u.pass===hashPass(pass));
   if (!user) { showNotif('E-mail ou senha incorretos','❌'); return; }
@@ -2014,6 +2023,12 @@ function doLogin() {
   if (user.status === 'rejeitado') {
     showNotif('❌ Seu acesso foi negado pelo administrador.', '❌');
     return;
+  }
+  // Salvar sessão se "lembrar de mim" marcado
+  if (lembrar) {
+    localStorage.setItem('ff_session', JSON.stringify({ userId: user.id }));
+  } else {
+    localStorage.removeItem('ff_session');
   }
   DB.currentUser = user;
   saveDB(DB);
@@ -2074,11 +2089,16 @@ function enterApp(user) {
 
 function doLogout() {
   DB.currentUser = null;
+  DB._forceSenha = false;
   saveDB(DB);
+  localStorage.removeItem('ff_session');
   document.getElementById('app').classList.remove('visible');
   document.getElementById('login-page').style.display = 'flex';
   document.getElementById('login-email').value = '';
   document.getElementById('login-pass').value = '';
+  if (document.getElementById('lembrar-me')) {
+    document.getElementById('lembrar-me').checked = false;
+  }
 }
 
 function alterarSenha() {
@@ -3240,11 +3260,34 @@ function showNotif(msg, icon='✅') {
    AUTO-LOGIN (check stored session)
 ================================ */
 window.addEventListener('DOMContentLoaded', () => {
-  // Login temporariamente desativado — entra direto como admin
-  const adminUser = DB.users.find(u => u.isAdmin === true) || DB.users[0];
-  DB.currentUser = adminUser;
-  saveDB(DB);
-  enterApp(adminUser);
+  // Verificar sessão salva (lembrar de mim)
+  const savedSession = localStorage.getItem('ff_session');
+  if (savedSession) {
+    try {
+      const { userId } = JSON.parse(savedSession);
+      const user = DB.users.find(u => u.id === userId);
+      if (user && user.status === 'aprovado') {
+        DB.currentUser = user;
+        saveDB(DB);
+        enterApp(user);
+        return;
+      } else {
+        localStorage.removeItem('ff_session');
+      }
+    } catch(e) {
+      localStorage.removeItem('ff_session');
+    }
+  }
+  // Verificar sessão normal
+  if (DB.currentUser) {
+    const user = DB.users.find(u => u.id === DB.currentUser.id);
+    if (user && user.status === 'aprovado') {
+      enterApp(user);
+      return;
+    }
+    DB.currentUser = null;
+    saveDB(DB);
+  }
 
   // Swipe para fechar sidebar no mobile
   let touchStartX = 0;

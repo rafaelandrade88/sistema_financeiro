@@ -2869,11 +2869,17 @@
           enterApp(profile);
         }
       } catch (e) {
-        console.error(e);
+        console.error('LOGIN ERROR:', e.code, e.message);
         let msg = 'E-mail ou senha incorretos';
         if (e.code === 'auth/too-many-requests') msg = 'Muitas tentativas. Aguarde alguns minutos.';
         if (e.code === 'auth/user-disabled') msg = 'Esta conta foi desativada.';
-        showNotif(msg, '❌');
+        if (e.code === 'auth/user-not-found') msg = 'E-mail não cadastrado no sistema.';
+        if (e.code === 'auth/wrong-password') msg = 'Senha incorreta. Tente novamente.';
+        if (e.code === 'auth/invalid-credential') msg = 'Credenciais inválidas. Verifique e-mail e senha.';
+        if (e.code === 'auth/invalid-email') msg = 'Formato de e-mail inválido.';
+        if (e.code === 'auth/network-request-failed') msg = 'Erro de conexão. Verifique sua internet.';
+        if (e.message === 'Perfil não encontrado') msg = 'Perfil não encontrado. Entre em contato com o admin.';
+        showNotif(msg + ' (' + (e.code || e.message) + ')', '❌');
       } finally {
         if (btn) { btn.disabled = false; btn.textContent = '✦ Entrar'; }
       }
@@ -4235,6 +4241,7 @@
 
     // Login: autentica no Firebase Auth + busca perfil no Firestore
     window.fbLogin = async (email, password) => {
+      if (!fbAuth) throw new Error('Firebase Auth não inicializado');
       const cred = await signInWithEmailAndPassword(fbAuth, email, password);
       const snap = await getDoc(doc(fbDB, "users", cred.user.uid));
 

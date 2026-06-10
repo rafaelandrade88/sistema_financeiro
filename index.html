@@ -1704,7 +1704,7 @@
           <div class="nav-sub-item" onclick="navigate('formas-pagamento')">Formas de Pagamento</div>
           <div class="nav-sub-item" onclick="navigate('efetivados')">Efetivados / Pendentes</div>
           <div class="nav-sub-item" onclick="navigate('gastos-fixos')">Gastos Fixos Mensais</div>
-        <div class="nav-sub-item" onclick="navigate('gastos-variaveis')">Gastos Variáveis</div>
+          <div class="nav-sub-item" onclick="navigate('gastos-variaveis')">Gastos Variáveis</div>
         </div>
 
         <!-- PLANEJAMENTO -->
@@ -2088,48 +2088,59 @@
         </section>
 
         <!-- ===================== GASTOS VARIÁVEIS ===================== -->
-      <section class="section" id="sec-gastos-variaveis">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-          <div>
-            <div style="font-family:var(--font-display);font-size:18px;font-weight:700">Gastos Variáveis</div>
-            <div style="font-size:13px;color:var(--text-2);margin-top:2px">Despesas que podem ou não ocorrer no mês</div>
+        <section class="section" id="sec-gastos-variaveis">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <div>
+              <div style="font-family:var(--font-display);font-size:18px;font-weight:700">Gastos Variáveis</div>
+              <div style="font-size:13px;color:var(--text-2);margin-top:2px">Despesas que podem ou não ocorrer no mês
+              </div>
+            </div>
+            <button class="btn btn-accent" onclick="openModal('modal-lancamento')">+ Registrar Gasto</button>
           </div>
-          <button class="btn btn-accent" onclick="openModal('modal-lancamento')">+ Registrar Gasto</button>
-        </div>
 
-        <div class="kpi-grid" style="margin-bottom:16px">
-          <div class="kpi-card accent-red">
-            <div class="kpi-label">💸 Total Variáveis</div>
-            <div class="kpi-value" id="var-total">R$ 0</div>
-            <div class="kpi-change down" id="var-qtd">0 lançamentos</div>
+          <div class="kpi-grid" style="margin-bottom:16px">
+            <div class="kpi-card accent-red">
+              <div class="kpi-label">💸 Total Variáveis</div>
+              <div class="kpi-value" id="var-total">R$ 0</div>
+              <div class="kpi-change down" id="var-qtd">0 lançamentos</div>
+            </div>
+            <div class="kpi-card accent-yellow">
+              <div class="kpi-label">📊 Maior Gasto</div>
+              <div class="kpi-value" id="var-maior">R$ 0</div>
+              <div class="kpi-change" style="color:var(--text-2)" id="var-maior-desc">—</div>
+            </div>
+            <div class="kpi-card accent-purple">
+              <div class="kpi-label">🏷️ Categorias</div>
+              <div class="kpi-value" id="var-cats">0</div>
+              <div class="kpi-change" style="color:var(--text-2)">categorias distintas</div>
+            </div>
+            <div class="kpi-card accent-green">
+              <div class="kpi-label">📅 Média por Dia</div>
+              <div class="kpi-value" id="var-media-dia">R$ 0</div>
+              <div class="kpi-change" style="color:var(--text-2)">este mês</div>
+            </div>
           </div>
-          <div class="kpi-card accent-yellow">
-            <div class="kpi-label">📊 Maior Gasto</div>
-            <div class="kpi-value" id="var-maior">R$ 0</div>
-            <div class="kpi-change" style="color:var(--text-2)" id="var-maior-desc">—</div>
-          </div>
-          <div class="kpi-card accent-purple">
-            <div class="kpi-label">🏷️ Categorias</div>
-            <div class="kpi-value" id="var-cats">0</div>
-            <div class="kpi-change" style="color:var(--text-2)">categorias distintas</div>
-          </div>
-          <div class="kpi-card accent-green">
-            <div class="kpi-label">📅 Média por Dia</div>
-            <div class="kpi-value" id="var-media-dia">R$ 0</div>
-            <div class="kpi-change" style="color:var(--text-2)">este mês</div>
-          </div>
-        </div>
 
-        <div class="card">
-          <div class="card-title">📋 Lançamentos Variáveis do Mês</div>
-          <table class="data-table">
-            <thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Forma Pag.</th><th>Status</th><th style="text-align:right">Valor</th><th>Ações</th></tr></thead>
-            <tbody id="var-tbody"></tbody>
-          </table>
-        </div>
-      </section>
+          <div class="card">
+            <div class="card-title">📋 Lançamentos Variáveis do Mês</div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Descrição</th>
+                  <th>Categoria</th>
+                  <th>Forma Pag.</th>
+                  <th>Status</th>
+                  <th style="text-align:right">Valor</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="var-tbody"></tbody>
+            </table>
+          </div>
+        </section>
 
-      <!-- ===================== ORÇADO VS REAL ===================== -->
+        <!-- ===================== ORÇADO VS REAL ===================== -->
         <section class="section" id="sec-orcado-real">
           <div class="card" style="margin-bottom:16px">
             <div class="card-title">📊 Orçado vs Real — <span id="orcado-mes">Maio 2025</span></div>
@@ -2497,50 +2508,50 @@
   </div>
 
   <!-- MODAL: EDITAR GASTO FIXO -->
-<div class="modal-overlay" id="modal-fixo-edit">
-  <div class="modal">
-    <div class="modal-title">✏️ Editar Gasto Fixo</div>
-    <div class="modal-sub">Atualize as informações do gasto</div>
-    <input type="hidden" id="fixo-edit-id">
-    <div class="form-row form-row-1">
-      <div class="field">
-        <label>Descrição</label>
-        <input type="text" id="fixo-edit-desc" placeholder="Ex: Plano de Saúde">
+  <div class="modal-overlay" id="modal-fixo-edit">
+    <div class="modal">
+      <div class="modal-title">✏️ Editar Gasto Fixo</div>
+      <div class="modal-sub">Atualize as informações do gasto</div>
+      <input type="hidden" id="fixo-edit-id">
+      <div class="form-row form-row-1">
+        <div class="field">
+          <label>Descrição</label>
+          <input type="text" id="fixo-edit-desc" placeholder="Ex: Plano de Saúde">
+        </div>
       </div>
-    </div>
-    <div class="form-row">
-      <div class="field">
-        <label>Valor (R$)</label>
-        <input type="text" id="fixo-edit-valor" placeholder="0,00" inputmode="decimal" oninput="mascaraValor(this)">
+      <div class="form-row">
+        <div class="field">
+          <label>Valor (R$)</label>
+          <input type="text" id="fixo-edit-valor" placeholder="0,00" inputmode="decimal" oninput="mascaraValor(this)">
+        </div>
+        <div class="field">
+          <label>Dia Vencimento</label>
+          <input type="number" id="fixo-edit-dia" min="1" max="31" value="10">
+        </div>
       </div>
-      <div class="field">
-        <label>Dia Vencimento</label>
-        <input type="number" id="fixo-edit-dia" min="1" max="31" value="10">
+      <div class="form-row">
+        <div class="field">
+          <label>Categoria</label>
+          <select id="fixo-edit-cat"></select>
+        </div>
+        <div class="field">
+          <label>Forma de Pagamento</label>
+          <select id="fixo-edit-forma">
+            <option value="debito">Débito Automático</option>
+            <option value="boleto">Boleto</option>
+            <option value="pix">PIX</option>
+            <option value="credito">Cartão Crédito</option>
+          </select>
+        </div>
       </div>
-    </div>
-    <div class="form-row">
-      <div class="field">
-        <label>Categoria</label>
-        <select id="fixo-edit-cat"></select>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeModal('modal-fixo-edit')">Cancelar</button>
+        <button class="btn btn-accent" onclick="salvarFixoEdit()">Salvar Alterações</button>
       </div>
-      <div class="field">
-        <label>Forma de Pagamento</label>
-        <select id="fixo-edit-forma">
-          <option value="debito">Débito Automático</option>
-          <option value="boleto">Boleto</option>
-          <option value="pix">PIX</option>
-          <option value="credito">Cartão Crédito</option>
-        </select>
-      </div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closeModal('modal-fixo-edit')">Cancelar</button>
-      <button class="btn btn-accent" onclick="salvarFixoEdit()">Salvar Alterações</button>
     </div>
   </div>
-</div>
 
-<!-- MODAL: NOVO USUÁRIO -->
+  <!-- MODAL: NOVO USUÁRIO -->
   <div class="modal-overlay" id="modal-user">
     <div class="modal">
       <div class="modal-title">👤 Cadastrar Usuário</div>
@@ -2712,12 +2723,17 @@
       try {
         const fbUsers = await window.fbGetUsers();
         if (!fbUsers || fbUsers.length === 0) {
-          // Primeira vez — subir admin local para Firebase se existir
           const adminLocal = DB.users.find(u => u.isAdmin === true);
           if (adminLocal && window.fbSaveUser) await window.fbSaveUser(adminLocal);
           return;
         }
+        // Atualizar apenas a lista de usuários, não sobrescrever dados financeiros
         DB.users = fbUsers;
+        // Manter currentUser atualizado se já logado
+        if (DB.currentUser) {
+          const updated = fbUsers.find(u => u.id === DB.currentUser.id);
+          if (updated) DB.currentUser = updated;
+        }
         saveDB(DB);
       } catch (e) {
         console.error('syncUsersFromFirebase:', e);
@@ -3050,14 +3066,14 @@
       } catch (e) {
         console.error('LOGIN ERROR:', e.code, e.message);
         let msg = 'E-mail ou senha incorretos';
-        if (e.code === 'auth/too-many-requests')   msg = 'Muitas tentativas. Aguarde alguns minutos.';
-        if (e.code === 'auth/user-disabled')        msg = 'Esta conta foi desativada.';
-        if (e.code === 'auth/user-not-found')       msg = 'E-mail não cadastrado no sistema.';
-        if (e.code === 'auth/wrong-password')       msg = 'Senha incorreta. Tente novamente.';
-        if (e.code === 'auth/invalid-credential')   msg = 'Credenciais inválidas. Verifique e-mail e senha.';
-        if (e.code === 'auth/invalid-email')        msg = 'Formato de e-mail inválido.';
+        if (e.code === 'auth/too-many-requests') msg = 'Muitas tentativas. Aguarde alguns minutos.';
+        if (e.code === 'auth/user-disabled') msg = 'Esta conta foi desativada.';
+        if (e.code === 'auth/user-not-found') msg = 'E-mail não cadastrado no sistema.';
+        if (e.code === 'auth/wrong-password') msg = 'Senha incorreta. Tente novamente.';
+        if (e.code === 'auth/invalid-credential') msg = 'Credenciais inválidas. Verifique e-mail e senha.';
+        if (e.code === 'auth/invalid-email') msg = 'Formato de e-mail inválido.';
         if (e.code === 'auth/network-request-failed') msg = 'Erro de conexão. Verifique sua internet.';
-        if (e.message === 'Perfil não encontrado')  msg = 'Perfil não encontrado. Entre em contato com o admin.';
+        if (e.message === 'Perfil não encontrado') msg = 'Perfil não encontrado. Entre em contato com o admin.';
         showNotif(msg + ' (' + (e.code || e.message) + ')', '❌');
       } finally {
         if (btn) { btn.disabled = false; btn.textContent = '✦ Entrar'; }
@@ -3138,7 +3154,8 @@
     /* ===============================
        ENTER APP
     ================================ */
-    function enterApp(user) {
+    async function enterApp(user) {
+      // Mostrar loading
       document.getElementById('login-page').style.display = 'none';
       document.getElementById('app').classList.add('visible');
       document.getElementById('user-name-nav').textContent = user.name;
@@ -3154,6 +3171,23 @@
       } else {
         document.documentElement.setAttribute('data-theme', 'dark');
         if (th) th.checked = true;
+      }
+
+      // Carregar dados do usuário do Firebase (isolados por uid)
+      if (window.fbCarregarDados && user.id) {
+        try {
+          const dados = await window.fbCarregarDados(user.id);
+          if (dados) {
+            // Substituir dados locais pelos dados do Firebase deste usuário
+            DB.lancamentos = dados.lancamentos || [];
+            DB.gastos_fixos = dados.gastos_fixos || [];
+            DB.metas = dados.metas || [];
+            if (dados.orcamentos) DB.orcamentos = dados.orcamentos;
+            saveDB(DB);
+          }
+        } catch (e) {
+          console.error('Erro ao carregar dados do Firebase:', e);
+        }
       }
 
       populateCatSelects();
@@ -3321,7 +3355,7 @@
       // Dados reais dos últimos 6 meses
       const now6 = new Date();
       const recData = [], despData = [], months6 = [];
-      const MN = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+      const MN = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
       for (let i = 5; i >= 0; i--) {
         const d = new Date(now6.getFullYear(), now6.getMonth() - i, 1);
         months6.push(MN[d.getMonth()]);
@@ -3339,7 +3373,7 @@
         chartInstances['evo'] = new Chart(evoCtx, {
           type: 'line',
           data: {
-                        labels: months6, datasets: [
+            labels: months6, datasets: [
               { label: 'Receitas', data: recData, borderColor: '#00C896', backgroundColor: 'rgba(0,200,150,.1)', fill: true, tension: .4, pointBackgroundColor: '#00C896', pointRadius: 4 },
               { label: 'Despesas', data: despData, borderColor: '#FF5A5A', backgroundColor: 'rgba(255,90,90,.08)', fill: true, tension: .4, pointBackgroundColor: '#FF5A5A', pointRadius: 4, borderDash: [0] }
             ]
@@ -3503,7 +3537,7 @@
       const months = [];
       const rec = [];
       const desp = [];
-      const MONTH_NAMES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+      const MONTH_NAMES = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
       for (let i = 5; i >= 0; i--) {
         const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
         const m = d.getMonth();
@@ -3602,12 +3636,12 @@
       const list = getDespesas(getLancamentosMes()).filter(l => l.cat === 'transporte');
 
       // Classificação por palavras-chave na descrição OU subcat
-      const isApp   = l => ['uber','99','cabify','99pop','ifood','lyft','bolt'].some(k => l.desc.toLowerCase().includes(k)) || l.subcat === 'app';
-      const isPub   = l => ['metro','ônibus','onibus','bus','trem','brt','van'].some(k => l.desc.toLowerCase().includes(k)) || l.subcat === 'pub';
-      const isComb  = l => ['combustível','combustivel','gasolina','etanol','diesel','alcool','posto'].some(k => l.desc.toLowerCase().includes(k)) || l.subcat === 'comb';
+      const isApp = l => ['uber', '99', 'cabify', '99pop', 'ifood', 'lyft', 'bolt'].some(k => l.desc.toLowerCase().includes(k)) || l.subcat === 'app';
+      const isPub = l => ['metro', 'ônibus', 'onibus', 'bus', 'trem', 'brt', 'van'].some(k => l.desc.toLowerCase().includes(k)) || l.subcat === 'pub';
+      const isComb = l => ['combustível', 'combustivel', 'gasolina', 'etanol', 'diesel', 'alcool', 'posto'].some(k => l.desc.toLowerCase().includes(k)) || l.subcat === 'comb';
 
-      const app  = list.filter(l => isApp(l));
-      const pub  = list.filter(l => !isApp(l) && isPub(l));
+      const app = list.filter(l => isApp(l));
+      const pub = list.filter(l => !isApp(l) && isPub(l));
       const comb = list.filter(l => !isApp(l) && !isPub(l) && isComb(l));
       const other = list.filter(l => !isApp(l) && !isPub(l) && !isComb(l));
 
@@ -3725,7 +3759,15 @@
 
     function toggleStatus(id) {
       const l = DB.lancamentos.find(x => x.id === id);
-      if (l) { l.status = l.status === 'efetivado' ? 'pendente' : 'efetivado'; saveDB(DB); renderEfetivados(); showNotif('Status atualizado!', '✅'); }
+      if (l) {
+        l.status = l.status === 'efetivado' ? 'pendente' : 'efetivado';
+        saveDB(DB);
+        if (window.fbSaveLancamento && DB.currentUser?.id) {
+          window.fbSaveLancamento(DB.currentUser.id, l);
+        }
+        renderEfetivados();
+        showNotif('Status atualizado!', '✅');
+      }
     }
 
     /* ===============================
@@ -3778,17 +3820,20 @@
     }
 
     function salvarFixoEdit() {
-      const id    = document.getElementById('fixo-edit-id').value;
-      const desc  = document.getElementById('fixo-edit-desc').value.trim();
+      const id = document.getElementById('fixo-edit-id').value;
+      const desc = document.getElementById('fixo-edit-desc').value.trim();
       const valor = parseValor(document.getElementById('fixo-edit-valor').value);
-      const dia   = parseInt(document.getElementById('fixo-edit-dia').value) || 10;
-      const cat   = document.getElementById('fixo-edit-cat').value;
+      const dia = parseInt(document.getElementById('fixo-edit-dia').value) || 10;
+      const cat = document.getElementById('fixo-edit-cat').value;
       const forma = document.getElementById('fixo-edit-forma').value;
       if (!desc || !valor) { showNotif('Preencha todos os campos', '⚠️'); return; }
       const g = DB.gastos_fixos.find(x => x.id === id);
       if (!g) return;
       g.desc = desc; g.valor = valor; g.dia = dia; g.cat = cat; g.forma = forma;
       saveDB(DB);
+      if (window.fbSaveFixo && DB.currentUser?.id) {
+        window.fbSaveFixo(DB.currentUser.id, g);
+      }
       closeModal('modal-fixo-edit');
       showNotif('Gasto fixo atualizado!', '✅');
       renderGastosFixos();
@@ -3797,6 +3842,9 @@
     function removerFixo(id) {
       DB.gastos_fixos = DB.gastos_fixos.filter(g => g.id !== id);
       saveDB(DB);
+      if (window.fbDeleteFixo && DB.currentUser?.id) {
+        window.fbDeleteFixo(DB.currentUser.id, id);
+      }
       renderGastosFixos();
       showNotif('Gasto fixo removido!', '✅');
     }
@@ -4009,6 +4057,9 @@
       if (!m || val <= 0) { showNotif('Informe um valor válido', '⚠️'); return; }
       m.atual = Math.min(m.alvo, m.atual + val);
       saveDB(DB);
+      if (window.fbSaveMeta && DB.currentUser?.id) {
+        window.fbSaveMeta(DB.currentUser.id, m);
+      }
       renderMetas();
       showNotif(`+${fmt(val)} aportados em "${m.nome}"!`, '🎯');
     }
@@ -4016,6 +4067,9 @@
     function removerMeta(id) {
       DB.metas = DB.metas.filter(m => m.id !== id);
       saveDB(DB);
+      if (window.fbDeleteMeta && DB.currentUser?.id) {
+        window.fbDeleteMeta(DB.currentUser.id, id);
+      }
       renderMetas();
       showNotif('Meta removida', '✅');
     }
@@ -4063,6 +4117,9 @@
     function deletarLancamento(id) {
       DB.lancamentos = DB.lancamentos.filter(l => l.id !== id);
       saveDB(DB);
+      if (window.fbDeleteLancamento && DB.currentUser?.id) {
+        window.fbDeleteLancamento(DB.currentUser.id, id);
+      }
       renderLancamentos();
       showNotif('Lançamento removido!', '✅');
     }
@@ -4093,7 +4150,7 @@
             DB.users = fbUsers;
             saveDB(DB);
           }
-        } catch(e) { console.error('renderUsers fbGetUsers:', e); }
+        } catch (e) { console.error('renderUsers fbGetUsers:', e); }
       }
 
       const isCurrentAdmin = DB.currentUser?.isAdmin === true;
@@ -4274,6 +4331,10 @@
       const l = { id: uid(), data, desc, tipo, valor, cat, forma, status, parc };
       DB.lancamentos.push(l);
       saveDB(DB);
+      // Sincronizar com Firebase
+      if (window.fbSaveLancamento && DB.currentUser?.id) {
+        window.fbSaveLancamento(DB.currentUser.id, l);
+      }
       closeModal('modal-lancamento');
       showNotif('Lançamento salvo com sucesso! 🎉', '✅');
 
@@ -4299,8 +4360,12 @@
 
       if (!nome || !alvo) { showNotif('Preencha o nome e valor da meta', '⚠️'); return; }
 
-      DB.metas.push({ id: uid(), nome, alvo, atual, prazo, tipo });
+      const novaMeta = { id: uid(), nome, alvo, atual, prazo, tipo };
+      DB.metas.push(novaMeta);
       saveDB(DB);
+      if (window.fbSaveMeta && DB.currentUser?.id) {
+        window.fbSaveMeta(DB.currentUser.id, novaMeta);
+      }
       closeModal('modal-meta');
       showNotif('Meta criada com sucesso! 🎯', '✅');
       renderMetas();
@@ -4322,8 +4387,12 @@
 
       if (!desc || !valor) { showNotif('Preencha todos os campos', '⚠️'); return; }
 
-      DB.gastos_fixos.push({ id: uid(), desc, valor, dia, cat, forma });
+      const novoFixo = { id: uid(), desc, valor, dia, cat, forma };
+      DB.gastos_fixos.push(novoFixo);
       saveDB(DB);
+      if (window.fbSaveFixo && DB.currentUser?.id) {
+        window.fbSaveFixo(DB.currentUser.id, novoFixo);
+      }
       closeModal('modal-fixo');
       showNotif('Gasto fixo cadastrado!', '✅');
       renderGastosFixos();
@@ -4520,8 +4589,8 @@
   </script>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, doc, setDoc, getDoc, collection, getDocs, onSnapshot, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, onAuthStateChanged, signOut, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, getDocs, onSnapshot, deleteDoc, query, where, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, signOut, updatePassword, reauthenticateWithCredential, EmailAuthProvider, isSignInWithEmailLink, signInWithEmailLink } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDVnSgV4ZOJ-HdFjt7TCgR1it8W-WeTOxQ",
@@ -4536,44 +4605,138 @@
     const fbDB = getFirestore(firebaseApp);
     const fbAuth = getAuth(firebaseApp);
 
-    // ========== FIRESTORE HELPERS ==========
+    // ========== HELPERS PATHS ==========
+    // Cada usuário tem sua própria subcolecão: users/{uid}/lancamentos, etc.
+    const userCol = (uid, col) => collection(fbDB, "users", uid, col);
+    const userDoc = (uid, col, id) => doc(fbDB, "users", uid, col, id);
 
+    // ========== USUÁRIOS ==========
     window.fbSaveUser = async (user) => {
-      try { await setDoc(doc(fbDB, "users", user.id), user); } catch (e) { console.error("fbSaveUser:", e); }
+      try { await setDoc(doc(fbDB, "users", user.id), user, { merge: true }); } catch (e) { console.error("fbSaveUser:", e); }
     };
-
     window.fbDeleteUser = async (userId) => {
       try { await deleteDoc(doc(fbDB, "users", userId)); } catch (e) { console.error("fbDeleteUser:", e); }
     };
-
     window.fbGetUsers = async () => {
       try {
         const snap = await getDocs(collection(fbDB, "users"));
-        return snap.docs.map(d => d.data());
+        return snap.docs.map(d => d.data()).filter(u => u.email);
       } catch (e) { console.error("fbGetUsers:", e); return []; }
     };
-
     window.fbListenUsers = (callback) => {
       return onSnapshot(collection(fbDB, "users"), (snap) => {
-        callback(snap.docs.map(d => d.data()));
+        callback(snap.docs.map(d => d.data()).filter(u => u.email));
       });
     };
 
-    // ========== AUTH HELPERS ==========
+    // ========== DADOS DO USUÁRIO (isolados por uid) ==========
 
-    // Cadastro: cria conta no Firebase Auth + perfil no Firestore
+    // Salvar um lançamento
+    window.fbSaveLancamento = async (uid, lancamento) => {
+      try { await setDoc(userDoc(uid, "lancamentos", lancamento.id), lancamento); } catch (e) { console.error("fbSaveLancamento:", e); }
+    };
+
+    // Deletar um lançamento
+    window.fbDeleteLancamento = async (uid, id) => {
+      try { await deleteDoc(userDoc(uid, "lancamentos", id)); } catch (e) { console.error("fbDeleteLancamento:", e); }
+    };
+
+    // Buscar todos os lançamentos do usuário
+    window.fbGetLancamentos = async (uid) => {
+      try {
+        const snap = await getDocs(userCol(uid, "lancamentos"));
+        return snap.docs.map(d => d.data());
+      } catch (e) { console.error("fbGetLancamentos:", e); return []; }
+    };
+
+    // Salvar gasto fixo
+    window.fbSaveFixo = async (uid, fixo) => {
+      try { await setDoc(userDoc(uid, "gastos_fixos", fixo.id), fixo); } catch (e) { console.error("fbSaveFixo:", e); }
+    };
+
+    // Deletar gasto fixo
+    window.fbDeleteFixo = async (uid, id) => {
+      try { await deleteDoc(userDoc(uid, "gastos_fixos", id)); } catch (e) { console.error("fbDeleteFixo:", e); }
+    };
+
+    // Buscar gastos fixos
+    window.fbGetFixos = async (uid) => {
+      try {
+        const snap = await getDocs(userCol(uid, "gastos_fixos"));
+        return snap.docs.map(d => d.data());
+      } catch (e) { console.error("fbGetFixos:", e); return []; }
+    };
+
+    // Salvar meta
+    window.fbSaveMeta = async (uid, meta) => {
+      try { await setDoc(userDoc(uid, "metas", meta.id), meta); } catch (e) { console.error("fbSaveMeta:", e); }
+    };
+
+    // Deletar meta
+    window.fbDeleteMeta = async (uid, id) => {
+      try { await deleteDoc(userDoc(uid, "metas", id)); } catch (e) { console.error("fbDeleteMeta:", e); }
+    };
+
+    // Buscar metas
+    window.fbGetMetas = async (uid) => {
+      try {
+        const snap = await getDocs(userCol(uid, "metas"));
+        return snap.docs.map(d => d.data());
+      } catch (e) { console.error("fbGetMetas:", e); return []; }
+    };
+
+    // Salvar orçamentos
+    window.fbSaveOrcamentos = async (uid, orcamentos) => {
+      try { await setDoc(userDoc(uid, "config", "orcamentos"), { data: orcamentos }); } catch (e) { console.error("fbSaveOrcamentos:", e); }
+    };
+
+    // Buscar orçamentos
+    window.fbGetOrcamentos = async (uid) => {
+      try {
+        const snap = await getDoc(userDoc(uid, "config", "orcamentos"));
+        return snap.exists() ? snap.data().data : null;
+      } catch (e) { console.error("fbGetOrcamentos:", e); return null; }
+    };
+
+    // Carregar TODOS os dados do usuário de uma vez
+    window.fbCarregarDados = async (uid) => {
+      try {
+        const [lanc, fixos, metas, orc] = await Promise.all([
+          window.fbGetLancamentos(uid),
+          window.fbGetFixos(uid),
+          window.fbGetMetas(uid),
+          window.fbGetOrcamentos(uid),
+        ]);
+        return { lancamentos: lanc, gastos_fixos: fixos, metas, orcamentos: orc };
+      } catch (e) { console.error("fbCarregarDados:", e); return null; }
+    };
+
+    // ========== AUTH ==========
+    window.fbLogin = async (email, password) => {
+      if (!fbAuth) throw new Error("Firebase Auth não inicializado");
+      const cred = await signInWithEmailAndPassword(fbAuth, email, password);
+      const snap = await getDoc(doc(fbDB, "users", cred.user.uid));
+      if (snap.exists()) return snap.data();
+      // Criar perfil automaticamente (admin criado manualmente no console)
+      const ADMIN_EMAIL = "admin@financeflow.app";
+      const isAdmin = email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+      const profile = {
+        id: cred.user.uid, firebaseUid: cred.user.uid,
+        name: isAdmin ? "Admin" : email.split("@")[0],
+        email, role: isAdmin ? "admin" : "comum",
+        isAdmin, primeiroAcesso: false, status: "aprovado",
+        cadastradoEm: new Date().toISOString()
+      };
+      await setDoc(doc(fbDB, "users", cred.user.uid), profile);
+      return profile;
+    };
+
     window.fbRegister = async (email, password, name) => {
       const cred = await createUserWithEmailAndPassword(fbAuth, email, password);
-      await sendEmailVerification(cred.user);
       const profile = {
-        id: cred.user.uid,
-        firebaseUid: cred.user.uid,
-        name,
-        email,
-        role: 'comum',
-        isAdmin: false,
-        primeiroAcesso: true,
-        status: 'pendente',
+        id: cred.user.uid, firebaseUid: cred.user.uid,
+        name, email, role: "comum", isAdmin: false,
+        primeiroAcesso: true, status: "pendente",
         cadastradoEm: new Date().toISOString()
       };
       await setDoc(doc(fbDB, "users", cred.user.uid), profile);
@@ -4581,120 +4744,22 @@
       return profile;
     };
 
-    // Login: autentica no Firebase Auth + busca perfil no Firestore
-    window.fbLogin = async (email, password) => {
-      if (!fbAuth) throw new Error('Firebase Auth não inicializado');
-      const cred = await signInWithEmailAndPassword(fbAuth, email, password);
-      const snap = await getDoc(doc(fbDB, "users", cred.user.uid));
-
-      // Perfil existe — retornar normalmente
-      if (snap.exists()) return snap.data();
-
-      // Perfil não existe — pode ser o admin criado manualmente no Firebase Auth
-      // Verificar se é o e-mail admin configurado
-      const ADMIN_EMAIL = 'admin@financeflow.app';
-      const isAdmin = email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
-
-      // Criar perfil automaticamente no Firestore
-      const profile = {
-        id: cred.user.uid,
-        firebaseUid: cred.user.uid,
-        name: isAdmin ? 'Admin' : email.split('@')[0],
-        email: email,
-        role: isAdmin ? 'admin' : 'comum',
-        isAdmin: isAdmin,
-        primeiroAcesso: false,
-        status: 'aprovado',
-        cadastradoEm: new Date().toISOString()
-      };
-
-      await setDoc(doc(fbDB, "users", cred.user.uid), profile);
-      return profile;
-    };
-
-    // Logout Firebase
-    window.fbLogout = async () => {
-      try { await signOut(fbAuth); } catch (e) { }
-    };
-
-    // Enviar e-mail de redefinição de senha
-    window.fbResetPassword = async (email) => {
-      await sendPasswordResetEmail(fbAuth, email);
-    };
-
-    // Alterar senha do usuário logado
-    window.fbChangePassword = async (senhaAtual, novaSenha) => {
-      const user = fbAuth.currentUser;
-      if (!user) throw new Error('Não autenticado');
-      const cred = EmailAuthProvider.credential(user.email, senhaAtual);
-      await reauthenticateWithCredential(user, cred);
-      await updatePassword(user, novaSenha);
-    };
-
-    // Criar usuário pelo admin (sem deslogar admin)
-    window.fbCreateUserByAdmin = async (email, password, name) => {
-      // Usa uma segunda instância temporária para não deslogar admin
-      const secondApp = initializeApp(firebaseConfig, 'secondary');
-      const secondAuth = getAuth(secondApp);
-      try {
-        const cred = await createUserWithEmailAndPassword(secondAuth, email, password);
-        const profile = {
-          id: cred.user.uid,
-          firebaseUid: cred.user.uid,
-          name, email,
-          role: 'comum',
-          isAdmin: false,
-          primeiroAcesso: true,
-          status: 'aprovado',
-          cadastradoEm: new Date().toISOString()
-        };
-        await setDoc(doc(fbDB, "users", cred.user.uid), profile);
-        await signOut(secondAuth);
-        return profile;
-      } finally {
-        await secondApp.delete();
-      }
-    };
-
-    // Salvar registro pendente de convite
-    window.fbSavePending = async (data) => {
-      try { await setDoc(doc(fbDB, "invites", data.id), data); } catch (e) { console.error(e); }
-    };
-
-    // Completar cadastro via link do Firebase Email Link
     window.fbSignInWithEmailLink = async (email, senha, nome) => {
-      const { signInWithEmailLink, isSignInWithEmailLink, updatePassword } =
-        await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
-
-      // Verificar se a URL atual é um link de login do Firebase
       const url = window.location.href;
       let userCredential;
-
       if (isSignInWithEmailLink(fbAuth, url)) {
-        // Link ainda na URL (caso raro — normalmente já limpamos antes)
         userCredential = await signInWithEmailLink(fbAuth, email, url);
       } else if (window._firebaseOobCode) {
-        // Reconstruir a URL de ação com o oobCode salvo
         const actionUrl = `https://financeflow-5bed5.firebaseapp.com/__/auth/action?mode=signIn&oobCode=${window._firebaseOobCode}&apiKey=AIzaSyDVnSgV4ZOJ-HdFjt7TCgR1it8W-WeTOxQ`;
         userCredential = await signInWithEmailLink(fbAuth, email, actionUrl);
       } else {
-        // Fallback: criar conta normal
         return await window.fbRegister(email, senha, nome);
       }
-
-      // Definir a senha para o usuário poder logar depois
       await updatePassword(userCredential.user, senha);
-
-      // Criar perfil no Firestore
       const profile = {
-        id: userCredential.user.uid,
-        firebaseUid: userCredential.user.uid,
-        name: nome,
-        email: email,
-        role: 'comum',
-        isAdmin: false,
-        primeiroAcesso: false,
-        status: 'pendente',
+        id: userCredential.user.uid, firebaseUid: userCredential.user.uid,
+        name: nome, email, role: "comum", isAdmin: false,
+        primeiroAcesso: false, status: "pendente",
         cadastradoEm: new Date().toISOString()
       };
       await setDoc(doc(fbDB, "users", userCredential.user.uid), profile);
@@ -4702,21 +4767,50 @@
       return profile;
     };
 
-    // Enviar convite por e-mail usando Firebase Dynamic Links / Action URL
+    window.fbLogout = async () => { try { await signOut(fbAuth); } catch (e) { } };
+
+    window.fbResetPassword = async (email) => { await sendPasswordResetEmail(fbAuth, email); };
+
+    window.fbChangePassword = async (senhaAtual, novaSenha) => {
+      const user = fbAuth.currentUser;
+      if (!user) throw new Error("Não autenticado");
+      const cred = EmailAuthProvider.credential(user.email, senhaAtual);
+      await reauthenticateWithCredential(user, cred);
+      await updatePassword(user, novaSenha);
+    };
+
+    window.fbCreateUserByAdmin = async (email, password, name) => {
+      const { initializeApp: initApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+      const secondApp = initApp(firebaseConfig, "secondary_" + Date.now());
+      const { getAuth: getAuth2, createUserWithEmailAndPassword: createUser2, signOut: signOut2 } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+      const secondAuth = getAuth2(secondApp);
+      try {
+        const cred = await createUser2(secondAuth, email, password);
+        const profile = {
+          id: cred.user.uid, firebaseUid: cred.user.uid,
+          name, email, role: "comum", isAdmin: false,
+          primeiroAcesso: true, status: "aprovado",
+          cadastradoEm: new Date().toISOString()
+        };
+        await setDoc(doc(fbDB, "users", cred.user.uid), profile);
+        await signOut2(secondAuth);
+        return profile;
+      } finally { await secondApp.delete(); }
+    };
+
+    window.fbSavePending = async (data) => {
+      try { await setDoc(doc(fbDB, "invites", data.id), data); } catch (e) { console.error(e); }
+    };
+
     window.fbEnviarConvite = async (email, link) => {
-      // Firebase Auth: enviar link de login por e-mail (Email Link / Passwordless)
       const { sendSignInLinkToEmail } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
-      const actionCodeSettings = {
-        url: link,
-        handleCodeInApp: true,
-      };
+      const actionCodeSettings = { url: link, handleCodeInApp: true };
       await sendSignInLinkToEmail(fbAuth, email, actionCodeSettings);
-      // Guardar e-mail localmente para confirmar depois
-      localStorage.setItem('ff_invite_email', email);
+      localStorage.setItem("ff_invite_email", email);
     };
 
     window.firebaseReady = true;
-    window.dispatchEvent(new Event('firebaseReady'));
+    window.dispatchEvent(new Event("firebaseReady"));
   </script>
 </body>
 

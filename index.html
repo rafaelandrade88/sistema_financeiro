@@ -2592,6 +2592,47 @@
       return re.test(email);
     }
 
+    // Atualizar badge de pendentes na sidebar
+    function atualizarBadgePendentes() {
+      const pendentes = DB.users.filter(u => u.status === 'pendente').length;
+      const badge = document.getElementById('badge-pendentes');
+      if (badge) {
+        badge.textContent = pendentes;
+        badge.style.display = pendentes > 0 ? 'inline-block' : 'none';
+      }
+    }
+
+    // Sincronizar usuários do Firebase para o local
+    async function syncUsersFromFirebase() {
+      if (!window.fbGetUsers) return;
+      try {
+        const fbUsers = await window.fbGetUsers();
+        if (!fbUsers || fbUsers.length === 0) {
+          // Primeira vez — subir admin local para Firebase se existir
+          const adminLocal = DB.users.find(u => u.isAdmin === true);
+          if (adminLocal && window.fbSaveUser) await window.fbSaveUser(adminLocal);
+          return;
+        }
+        DB.users = fbUsers;
+        saveDB(DB);
+      } catch (e) {
+        console.error('syncUsersFromFirebase:', e);
+      }
+    }
+
+    // Sincronizar usuários locais para o Firebase
+    async function syncUsersToFirebase(users) {
+      if (!window.fbSaveUser) return;
+      for (const user of users) {
+        await window.fbSaveUser(user);
+      }
+    }
+
+    function validarEmail(email) {
+      const re = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+      return re.test(email);
+    }
+
     /* ===============================
        CATEGORIES CONFIG
     ================================ */
@@ -3780,9 +3821,21 @@
     /* ===============================
        USUÁRIOS
     ================================ */
-    function renderUsers() {
+    async function renderUsers() {
       const el = document.getElementById('users-list');
       if (!el) return;
+
+      // Buscar usuários atualizados do Firebase antes de renderizar
+      if (window.fbGetUsers) {
+        try {
+          const fbUsers = await window.fbGetUsers();
+          if (fbUsers && fbUsers.length > 0) {
+            DB.users = fbUsers;
+            saveDB(DB);
+          }
+        } catch (e) { console.error('renderUsers fbGetUsers:', e); }
+      }
+
       const isCurrentAdmin = DB.currentUser?.isAdmin === true;
 
       // Atualiza badge de pendentes na sidebar

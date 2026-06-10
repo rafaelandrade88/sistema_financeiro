@@ -2957,6 +2957,33 @@
     }
 
     /* ===============================
+       ENTER APP
+    ================================ */
+    function enterApp(user) {
+      document.getElementById('login-page').style.display = 'none';
+      document.getElementById('app').classList.add('visible');
+      document.getElementById('user-name-nav').textContent = user.name;
+      document.getElementById('user-email-nav').textContent = user.email;
+      const initials = user.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+      document.getElementById('user-avatar-nav').textContent = initials;
+
+      // Aplicar tema salvo
+      const th = document.getElementById('toggle-theme');
+      if (DB.theme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+        if (th) th.checked = false;
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        if (th) th.checked = true;
+      }
+
+      populateCatSelects();
+      initSidebarOpen();
+      atualizarBadgePendentes();
+      navigate('visao-geral');
+    }
+
+    /* ===============================
        NAVIGATION
     ================================ */
     const SEC_TITLES = {

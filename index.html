@@ -1704,6 +1704,7 @@
           <div class="nav-sub-item" onclick="navigate('formas-pagamento')">Formas de Pagamento</div>
           <div class="nav-sub-item" onclick="navigate('efetivados')">Efetivados / Pendentes</div>
           <div class="nav-sub-item" onclick="navigate('gastos-fixos')">Gastos Fixos Mensais</div>
+        <div class="nav-sub-item" onclick="navigate('gastos-variaveis')">Gastos Variáveis</div>
         </div>
 
         <!-- PLANEJAMENTO -->
@@ -2086,7 +2087,49 @@
           </div>
         </section>
 
-        <!-- ===================== ORÇADO VS REAL ===================== -->
+        <!-- ===================== GASTOS VARIÁVEIS ===================== -->
+      <section class="section" id="sec-gastos-variaveis">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div>
+            <div style="font-family:var(--font-display);font-size:18px;font-weight:700">Gastos Variáveis</div>
+            <div style="font-size:13px;color:var(--text-2);margin-top:2px">Despesas que podem ou não ocorrer no mês</div>
+          </div>
+          <button class="btn btn-accent" onclick="openModal('modal-lancamento')">+ Registrar Gasto</button>
+        </div>
+
+        <div class="kpi-grid" style="margin-bottom:16px">
+          <div class="kpi-card accent-red">
+            <div class="kpi-label">💸 Total Variáveis</div>
+            <div class="kpi-value" id="var-total">R$ 0</div>
+            <div class="kpi-change down" id="var-qtd">0 lançamentos</div>
+          </div>
+          <div class="kpi-card accent-yellow">
+            <div class="kpi-label">📊 Maior Gasto</div>
+            <div class="kpi-value" id="var-maior">R$ 0</div>
+            <div class="kpi-change" style="color:var(--text-2)" id="var-maior-desc">—</div>
+          </div>
+          <div class="kpi-card accent-purple">
+            <div class="kpi-label">🏷️ Categorias</div>
+            <div class="kpi-value" id="var-cats">0</div>
+            <div class="kpi-change" style="color:var(--text-2)">categorias distintas</div>
+          </div>
+          <div class="kpi-card accent-green">
+            <div class="kpi-label">📅 Média por Dia</div>
+            <div class="kpi-value" id="var-media-dia">R$ 0</div>
+            <div class="kpi-change" style="color:var(--text-2)">este mês</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📋 Lançamentos Variáveis do Mês</div>
+          <table class="data-table">
+            <thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Forma Pag.</th><th>Status</th><th style="text-align:right">Valor</th><th>Ações</th></tr></thead>
+            <tbody id="var-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===================== ORÇADO VS REAL ===================== -->
         <section class="section" id="sec-orcado-real">
           <div class="card" style="margin-bottom:16px">
             <div class="card-title">📊 Orçado vs Real — <span id="orcado-mes">Maio 2025</span></div>
@@ -2315,7 +2358,7 @@
       <div class="form-row">
         <div class="field">
           <label>Valor (R$)</label>
-          <input type="number" id="lanc-valor" placeholder="0,00" step="0.01" min="0">
+          <input type="text" id="lanc-valor" placeholder="0,00" inputmode="decimal" oninput="mascaraValor(this)">
         </div>
         <div class="field">
           <label>Categoria</label>
@@ -2379,11 +2422,11 @@
       <div class="form-row">
         <div class="field">
           <label>Valor Alvo (R$)</label>
-          <input type="number" id="meta-alvo" placeholder="0,00" min="0">
+          <input type="text" id="meta-alvo" placeholder="0,00" inputmode="decimal" oninput="mascaraValor(this)">
         </div>
         <div class="field">
           <label>Valor Atual (R$)</label>
-          <input type="number" id="meta-atual" placeholder="0,00" min="0">
+          <input type="text" id="meta-atual" placeholder="0,00" inputmode="decimal" oninput="mascaraValor(this)">
         </div>
       </div>
       <div class="form-row">
@@ -2424,7 +2467,7 @@
       <div class="form-row">
         <div class="field">
           <label>Valor (R$)</label>
-          <input type="number" id="fixo-valor" min="0" step="0.01">
+          <input type="text" id="fixo-valor" placeholder="0,00" inputmode="decimal" oninput="mascaraValor(this)">
         </div>
         <div class="field">
           <label>Dia Vencimento</label>
@@ -2453,7 +2496,51 @@
     </div>
   </div>
 
-  <!-- MODAL: NOVO USUÁRIO -->
+  <!-- MODAL: EDITAR GASTO FIXO -->
+<div class="modal-overlay" id="modal-fixo-edit">
+  <div class="modal">
+    <div class="modal-title">✏️ Editar Gasto Fixo</div>
+    <div class="modal-sub">Atualize as informações do gasto</div>
+    <input type="hidden" id="fixo-edit-id">
+    <div class="form-row form-row-1">
+      <div class="field">
+        <label>Descrição</label>
+        <input type="text" id="fixo-edit-desc" placeholder="Ex: Plano de Saúde">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label>Valor (R$)</label>
+        <input type="text" id="fixo-edit-valor" placeholder="0,00" inputmode="decimal" oninput="mascaraValor(this)">
+      </div>
+      <div class="field">
+        <label>Dia Vencimento</label>
+        <input type="number" id="fixo-edit-dia" min="1" max="31" value="10">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label>Categoria</label>
+        <select id="fixo-edit-cat"></select>
+      </div>
+      <div class="field">
+        <label>Forma de Pagamento</label>
+        <select id="fixo-edit-forma">
+          <option value="debito">Débito Automático</option>
+          <option value="boleto">Boleto</option>
+          <option value="pix">PIX</option>
+          <option value="credito">Cartão Crédito</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modal-fixo-edit')">Cancelar</button>
+      <button class="btn btn-accent" onclick="salvarFixoEdit()">Salvar Alterações</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: NOVO USUÁRIO -->
   <div class="modal-overlay" id="modal-user">
     <div class="modal">
       <div class="modal-title">👤 Cadastrar Usuário</div>
@@ -2592,6 +2679,23 @@
       return re.test(email);
     }
 
+    // Máscara de valor monetário
+    function mascaraValor(input) {
+      let v = input.value.replace(/[^\d,]/g, '');
+      input.value = v;
+    }
+
+    // Parsear valor no formato BR (1.234,56) ou US (1234.56)
+    function parseValor(str) {
+      if (!str) return 0;
+      str = String(str).trim();
+      // Formato BR: 1.234,56
+      if (str.includes(',')) {
+        str = str.replace(/\./g, '').replace(',', '.');
+      }
+      return parseFloat(str) || 0;
+    }
+
     // Atualizar badge de pendentes na sidebar
     function atualizarBadgePendentes() {
       const pendentes = DB.users.filter(u => u.status === 'pendente').length;
@@ -2631,6 +2735,23 @@
     function validarEmail(email) {
       const re = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
       return re.test(email);
+    }
+
+    // Máscara de valor monetário
+    function mascaraValor(input) {
+      let v = input.value.replace(/[^\d,]/g, '');
+      input.value = v;
+    }
+
+    // Parsear valor no formato BR (1.234,56) ou US (1234.56)
+    function parseValor(str) {
+      if (!str) return 0;
+      str = String(str).trim();
+      // Formato BR: 1.234,56
+      if (str.includes(',')) {
+        str = str.replace(/\./g, '').replace(',', '.');
+      }
+      return parseFloat(str) || 0;
     }
 
     /* ===============================
@@ -2724,6 +2845,23 @@
     function validarEmail(email) {
       const re = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
       return re.test(email);
+    }
+
+    // Máscara de valor monetário
+    function mascaraValor(input) {
+      let v = input.value.replace(/[^\d,]/g, '');
+      input.value = v;
+    }
+
+    // Parsear valor no formato BR (1.234,56) ou US (1234.56)
+    function parseValor(str) {
+      if (!str) return 0;
+      str = String(str).trim();
+      // Formato BR: 1.234,56
+      if (str.includes(',')) {
+        str = str.replace(/\./g, '').replace(',', '.');
+      }
+      return parseFloat(str) || 0;
     }
 
     // Detectar link de cadastro na URL (?mode=cadastro&email=xxx)
@@ -2912,14 +3050,14 @@
       } catch (e) {
         console.error('LOGIN ERROR:', e.code, e.message);
         let msg = 'E-mail ou senha incorretos';
-        if (e.code === 'auth/too-many-requests') msg = 'Muitas tentativas. Aguarde alguns minutos.';
-        if (e.code === 'auth/user-disabled') msg = 'Esta conta foi desativada.';
-        if (e.code === 'auth/user-not-found') msg = 'E-mail não cadastrado no sistema.';
-        if (e.code === 'auth/wrong-password') msg = 'Senha incorreta. Tente novamente.';
-        if (e.code === 'auth/invalid-credential') msg = 'Credenciais inválidas. Verifique e-mail e senha.';
-        if (e.code === 'auth/invalid-email') msg = 'Formato de e-mail inválido.';
+        if (e.code === 'auth/too-many-requests')   msg = 'Muitas tentativas. Aguarde alguns minutos.';
+        if (e.code === 'auth/user-disabled')        msg = 'Esta conta foi desativada.';
+        if (e.code === 'auth/user-not-found')       msg = 'E-mail não cadastrado no sistema.';
+        if (e.code === 'auth/wrong-password')       msg = 'Senha incorreta. Tente novamente.';
+        if (e.code === 'auth/invalid-credential')   msg = 'Credenciais inválidas. Verifique e-mail e senha.';
+        if (e.code === 'auth/invalid-email')        msg = 'Formato de e-mail inválido.';
         if (e.code === 'auth/network-request-failed') msg = 'Erro de conexão. Verifique sua internet.';
-        if (e.message === 'Perfil não encontrado') msg = 'Perfil não encontrado. Entre em contato com o admin.';
+        if (e.message === 'Perfil não encontrado')  msg = 'Perfil não encontrado. Entre em contato com o admin.';
         showNotif(msg + ' (' + (e.code || e.message) + ')', '❌');
       } finally {
         if (btn) { btn.disabled = false; btn.textContent = '✦ Entrar'; }
@@ -3044,6 +3182,7 @@
       'config-tema': 'Configurações — Tema',
       'config-usuarios': 'Configurações — Usuários',
       'config-senha': 'Configurações — Senha',
+      'gastos-variaveis': 'Gastos Variáveis',
     };
 
     let currentSection = 'visao-geral';
@@ -3092,6 +3231,7 @@
         case 'formas-pagamento': renderFormasPagamento(); break;
         case 'efetivados': renderEfetivados(); break;
         case 'gastos-fixos': renderGastosFixos(); break;
+        case 'gastos-variaveis': renderGastosVariaveis(); break;
         case 'orcado-real': renderOrcadoReal(); break;
         case 'simulador': renderSimulador(); break;
         case 'metas': renderMetas(); break;
@@ -3178,16 +3318,28 @@
 
       // Evolution chart
       const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'];
-      const recData = [7200, 8100, 8500, 8500, totalRec || 9700, 0];
-      const despData = [5800, 6200, 5900, 6800, totalDesp || 6200, 0];
+      // Dados reais dos últimos 6 meses
+      const now6 = new Date();
+      const recData = [], despData = [], months6 = [];
+      const MN = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date(now6.getFullYear(), now6.getMonth() - i, 1);
+        months6.push(MN[d.getMonth()]);
+        const lm = DB.lancamentos.filter(l => {
+          if (!l.data) return false;
+          const ld = new Date(l.data);
+          return ld.getMonth() === d.getMonth() && ld.getFullYear() === d.getFullYear();
+        });
+        recData.push(sum(getReceitas(lm)));
+        despData.push(sum(getDespesas(lm)));
+      }
 
       const evoCtx = document.getElementById('chartEvolution');
       if (evoCtx) {
         chartInstances['evo'] = new Chart(evoCtx, {
           type: 'line',
           data: {
-            labels: months,
-            datasets: [
+                        labels: months6, datasets: [
               { label: 'Receitas', data: recData, borderColor: '#00C896', backgroundColor: 'rgba(0,200,150,.1)', fill: true, tension: .4, pointBackgroundColor: '#00C896', pointRadius: 4 },
               { label: 'Despesas', data: despData, borderColor: '#FF5A5A', backgroundColor: 'rgba(255,90,90,.08)', fill: true, tension: .4, pointBackgroundColor: '#FF5A5A', pointRadius: 4, borderDash: [0] }
             ]
@@ -3346,9 +3498,25 @@
        EVOLUÇÃO MENSAL
     ================================ */
     function renderEvolucao() {
-      const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'];
-      const rec = [7200, 8100, 8500, 8500, sum(getReceitas(getLancamentosMes())) || 9700, 0];
-      const desp = [5800, 6200, 5900, 6800, sum(getDespesas(getLancamentosMes())) || 6200, 0];
+      // Gerar dados reais dos últimos 6 meses a partir dos lançamentos
+      const now = new Date();
+      const months = [];
+      const rec = [];
+      const desp = [];
+      const MONTH_NAMES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const m = d.getMonth();
+        const y = d.getFullYear();
+        months.push(MONTH_NAMES[m]);
+        const lancMes = DB.lancamentos.filter(l => {
+          if (!l.data) return false;
+          const ld = new Date(l.data);
+          return ld.getMonth() === m && ld.getFullYear() === y;
+        });
+        rec.push(sum(getReceitas(lancMes)));
+        desp.push(sum(getDespesas(lancMes)));
+      }
 
       document.getElementById('evol-max-rec').textContent = fmt(Math.max(...rec));
       document.getElementById('evol-max-desp').textContent = fmt(Math.max(...desp));
@@ -3432,20 +3600,30 @@
     ================================ */
     function renderTransporte() {
       const list = getDespesas(getLancamentosMes()).filter(l => l.cat === 'transporte');
-      const combustivel = list.filter(l => l.desc.toLowerCase().includes('combustível') || l.desc.toLowerCase().includes('gasolina') || l.desc.toLowerCase().includes('etanol'));
-      const pub = list.filter(l => l.desc.toLowerCase().includes('metro') || l.desc.toLowerCase().includes('ônibus') || l.desc.toLowerCase().includes('bus'));
-      const app = list.filter(l => l.desc.toLowerCase().includes('uber') || l.desc.toLowerCase().includes('99') || l.desc.toLowerCase().includes('cabify'));
-      const other = list.filter(l => !combustivel.includes(l) && !pub.includes(l) && !app.includes(l));
+
+      // Classificação por palavras-chave na descrição OU subcat
+      const isApp   = l => ['uber','99','cabify','99pop','ifood','lyft','bolt'].some(k => l.desc.toLowerCase().includes(k)) || l.subcat === 'app';
+      const isPub   = l => ['metro','ônibus','onibus','bus','trem','brt','van'].some(k => l.desc.toLowerCase().includes(k)) || l.subcat === 'pub';
+      const isComb  = l => ['combustível','combustivel','gasolina','etanol','diesel','alcool','posto'].some(k => l.desc.toLowerCase().includes(k)) || l.subcat === 'comb';
+
+      const app  = list.filter(l => isApp(l));
+      const pub  = list.filter(l => !isApp(l) && isPub(l));
+      const comb = list.filter(l => !isApp(l) && !isPub(l) && isComb(l));
+      const other = list.filter(l => !isApp(l) && !isPub(l) && !isComb(l));
 
       document.getElementById('transp-total').textContent = fmt(sum(list));
-      document.getElementById('transp-comb').textContent = fmt(sum(combustivel) || sum(other));
+      document.getElementById('transp-comb').textContent = fmt(sum(comb) + sum(other));
       document.getElementById('transp-pub').textContent = fmt(sum(pub));
       document.getElementById('transp-app').textContent = fmt(sum(app));
 
       const tbody = document.getElementById('transp-tbody');
       if (tbody) tbody.innerHTML = list.length ? list.map(l => `
-    <tr><td>${fmtDate(l.data)}</td><td style="color:var(--text-1)">${l.desc}</td><td>${app.includes(l) ? 'Aplicativo' : pub.includes(l) ? 'Público' : 'Particular'}</td><td style="text-align:right;color:var(--danger);font-weight:600">−${fmt(l.valor)}</td></tr>
-  `).join('') : emptyRow(4);
+        <tr>
+          <td>${fmtDate(l.data)}</td>
+          <td style="color:var(--text-1)">${l.desc}</td>
+          <td>${isApp(l) ? '🚕 Aplicativo' : isPub(l) ? '🚇 Público' : isComb(l) ? '⛽ Combustível' : '🚗 Particular'}</td>
+          <td style="text-align:right;color:var(--danger);font-weight:600">−${fmt(l.valor)}</td>
+        </tr>`).join('') : emptyRow(4);
     }
 
     /* ===============================
@@ -3569,10 +3747,51 @@
         <td>Dia ${g.dia}</td>
         <td>${FORMAS[g.forma]?.label || g.forma}</td>
         <td style="text-align:right;color:var(--danger);font-weight:600">−${fmt(g.valor)}</td>
-        <td><button class="btn btn-danger" style="padding:4px 10px;font-size:11px" onclick="removerFixo('${g.id}')">✕</button></td>
+        <td style="display:flex;gap:6px">
+          <button class="btn btn-outline" style="padding:4px 10px;font-size:11px" onclick="editarFixo('${g.id}')">✏️</button>
+          <button class="btn btn-danger" style="padding:4px 10px;font-size:11px" onclick="removerFixo('${g.id}')">✕</button>
+        </td>
       </tr>
     `).join('') : emptyRow(6);
       }
+    }
+
+    function editarFixo(id) {
+      const g = DB.gastos_fixos.find(x => x.id === id);
+      if (!g) return;
+      document.getElementById('fixo-edit-id').value = g.id;
+      document.getElementById('fixo-edit-desc').value = g.desc;
+      document.getElementById('fixo-edit-valor').value = String(g.valor).replace('.', ',');
+      document.getElementById('fixo-edit-dia').value = g.dia;
+      // Popular select de categoria
+      const sel = document.getElementById('fixo-edit-cat');
+      sel.innerHTML = '';
+      Object.entries(CATS).forEach(([k, v]) => {
+        if (k === 'receita') return;
+        const opt = document.createElement('option');
+        opt.value = k; opt.textContent = v.icon + ' ' + v.label;
+        if (k === g.cat) opt.selected = true;
+        sel.appendChild(opt);
+      });
+      document.getElementById('fixo-edit-forma').value = g.forma;
+      openModal('modal-fixo-edit');
+    }
+
+    function salvarFixoEdit() {
+      const id    = document.getElementById('fixo-edit-id').value;
+      const desc  = document.getElementById('fixo-edit-desc').value.trim();
+      const valor = parseValor(document.getElementById('fixo-edit-valor').value);
+      const dia   = parseInt(document.getElementById('fixo-edit-dia').value) || 10;
+      const cat   = document.getElementById('fixo-edit-cat').value;
+      const forma = document.getElementById('fixo-edit-forma').value;
+      if (!desc || !valor) { showNotif('Preencha todos os campos', '⚠️'); return; }
+      const g = DB.gastos_fixos.find(x => x.id === id);
+      if (!g) return;
+      g.desc = desc; g.valor = valor; g.dia = dia; g.cat = cat; g.forma = forma;
+      saveDB(DB);
+      closeModal('modal-fixo-edit');
+      showNotif('Gasto fixo atualizado!', '✅');
+      renderGastosFixos();
     }
 
     function removerFixo(id) {
@@ -3580,6 +3799,47 @@
       saveDB(DB);
       renderGastosFixos();
       showNotif('Gasto fixo removido!', '✅');
+    }
+
+    /* ===============================
+       GASTOS VARIÁVEIS
+    ================================ */
+    function renderGastosVariaveis() {
+      // Gastos variáveis = despesas que NÃO são gastos fixos cadastrados
+      const fixosDesc = DB.gastos_fixos.map(g => g.desc.toLowerCase());
+      const list = getDespesas(getLancamentosMes()).filter(l => {
+        return !fixosDesc.includes(l.desc.toLowerCase());
+      });
+
+      const total = sum(list);
+      const maior = list.reduce((a, b) => b.valor > (a?.valor || 0) ? b : a, null);
+      const cats = new Set(list.map(l => l.cat)).size;
+      const diasMes = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+
+      document.getElementById('var-total').textContent = fmt(total);
+      document.getElementById('var-qtd').textContent = list.length + ' lançamentos';
+      document.getElementById('var-maior').textContent = fmt(maior?.valor || 0);
+      document.getElementById('var-maior-desc').textContent = maior?.desc || '—';
+      document.getElementById('var-cats').textContent = cats;
+      document.getElementById('var-media-dia').textContent = fmt(total / diasMes);
+
+      const tbody = document.getElementById('var-tbody');
+      if (tbody) {
+        const sorted = [...list].sort((a, b) => new Date(b.data) - new Date(a.data));
+        tbody.innerHTML = sorted.length ? sorted.map(l => {
+          const c = CATS[l.cat] || { label: l.cat, icon: '📦', color: '#999' };
+          const f = FORMAS[l.forma] || { label: l.forma, icon: '💰' };
+          return `<tr>
+            <td>${fmtDate(l.data)}</td>
+            <td style="color:var(--text-1);font-weight:500">${l.desc}</td>
+            <td><span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:2px;background:${c.color};flex-shrink:0"></span>${c.icon} ${c.label}</span></td>
+            <td>${f.icon} ${f.label}</td>
+            <td><span class="badge badge-${l.status === 'efetivado' ? 'success' : 'warning'}">${l.status === 'efetivado' ? '✅ Efetivado' : '⏳ Pendente'}</span></td>
+            <td style="text-align:right;color:var(--danger);font-weight:600">−${fmt(l.valor)}</td>
+            <td><button class="btn btn-danger" style="padding:4px 10px;font-size:11px" onclick="deletarLancamento('${l.id}')">✕</button></td>
+          </tr>`;
+        }).join('') : emptyRow(7);
+      }
     }
 
     /* ===============================
@@ -3833,7 +4093,7 @@
             DB.users = fbUsers;
             saveDB(DB);
           }
-        } catch (e) { console.error('renderUsers fbGetUsers:', e); }
+        } catch(e) { console.error('renderUsers fbGetUsers:', e); }
       }
 
       const isCurrentAdmin = DB.currentUser?.isAdmin === true;
@@ -3903,24 +4163,26 @@
 
       el.innerHTML = html;
     }
-    function aprovarUser(id) {
+    async function aprovarUser(id) {
       const target = DB.users.find(u => u.id === id);
       if (!target) return;
       if (!DB.currentUser?.isAdmin) { showNotif('Apenas o admin pode aprovar!', '⚠️'); return; }
       target.status = 'aprovado';
+      if (window.fbSaveUser) await window.fbSaveUser(target);
       saveDB(DB);
-      renderUsers();
       showNotif('✅ ' + target.name + ' aprovado! Já pode fazer login.', '✅');
+      renderUsers();
     }
 
-    function rejeitarUser(id) {
+    async function rejeitarUser(id) {
       const target = DB.users.find(u => u.id === id);
       if (!target) return;
       if (!DB.currentUser?.isAdmin) { showNotif('Apenas o admin pode rejeitar!', '⚠️'); return; }
       target.status = 'rejeitado';
+      if (window.fbSaveUser) await window.fbSaveUser(target);
       saveDB(DB);
-      renderUsers();
       showNotif('❌ Acesso de ' + target.name + ' negado.', '❌');
+      renderUsers();
     }
 
     function removerUser(id) {
@@ -3995,7 +4257,7 @@
       const tipo = document.getElementById('lanc-tipo').value;
       const data = document.getElementById('lanc-data').value;
       const desc = document.getElementById('lanc-desc').value.trim();
-      const valor = parseFloat(document.getElementById('lanc-valor').value) || 0;
+      const valor = parseValor(document.getElementById('lanc-valor').value);
       const cat = document.getElementById('lanc-cat').value;
       const forma = document.getElementById('lanc-forma').value;
       const status = document.getElementById('lanc-status').value;
@@ -4030,8 +4292,8 @@
     ================================ */
     function salvarMeta() {
       const nome = document.getElementById('meta-nome').value.trim();
-      const alvo = parseFloat(document.getElementById('meta-alvo').value) || 0;
-      const atual = parseFloat(document.getElementById('meta-atual').value) || 0;
+      const alvo = parseValor(document.getElementById('meta-alvo').value);
+      const atual = parseValor(document.getElementById('meta-atual').value);
       const prazo = document.getElementById('meta-prazo').value;
       const tipo = document.getElementById('meta-tipo').value;
 
@@ -4053,7 +4315,7 @@
     ================================ */
     function salvarFixo() {
       const desc = document.getElementById('fixo-desc').value.trim();
-      const valor = parseFloat(document.getElementById('fixo-valor').value) || 0;
+      const valor = parseValor(document.getElementById('fixo-valor').value);
       const dia = parseInt(document.getElementById('fixo-dia').value) || 10;
       const cat = document.getElementById('fixo-cat').value;
       const forma = document.getElementById('fixo-forma').value;

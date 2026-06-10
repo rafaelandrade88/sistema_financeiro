@@ -4237,8 +4237,30 @@
     window.fbLogin = async (email, password) => {
       const cred = await signInWithEmailAndPassword(fbAuth, email, password);
       const snap = await getDoc(doc(fbDB, "users", cred.user.uid));
-      if (!snap.exists()) throw new Error('Perfil não encontrado');
-      return snap.data();
+
+      // Perfil existe — retornar normalmente
+      if (snap.exists()) return snap.data();
+
+      // Perfil não existe — pode ser o admin criado manualmente no Firebase Auth
+      // Verificar se é o e-mail admin configurado
+      const ADMIN_EMAIL = 'admin@financeflow.app';
+      const isAdmin = email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+
+      // Criar perfil automaticamente no Firestore
+      const profile = {
+        id: cred.user.uid,
+        firebaseUid: cred.user.uid,
+        name: isAdmin ? 'Admin' : email.split('@')[0],
+        email: email,
+        role: isAdmin ? 'admin' : 'comum',
+        isAdmin: isAdmin,
+        primeiroAcesso: false,
+        status: 'aprovado',
+        cadastradoEm: new Date().toISOString()
+      };
+
+      await setDoc(doc(fbDB, "users", cred.user.uid), profile);
+      return profile;
     };
 
     // Logout Firebase

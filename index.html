@@ -2689,13 +2689,32 @@
     function verificarLinkCadastro() {
       const params = new URLSearchParams(window.location.search);
       const mode = params.get('mode');
-      const email = params.get('email');
-      if (mode === 'cadastro' && email) {
-        const emailDecoded = decodeURIComponent(email);
-        document.getElementById('completar-email').value = emailDecoded;
+
+      // Formato 1: link customizado ?mode=cadastro&email=xxx
+      if (mode === 'cadastro') {
+        const email = params.get('email');
+        if (email) {
+          document.getElementById('completar-email').value = decodeURIComponent(email);
+          showScreen('screen-completar');
+          return true;
+        }
+      }
+
+      // Formato 2: link do Firebase Email Link (mode=signIn)
+      // Firebase envia: ?mode=signIn&oobCode=xxx&apiKey=xxx&lang=xx
+      if (mode === 'signIn' && params.get('oobCode')) {
+        // Recuperar e-mail salvo localmente quando enviou o convite
+        const emailSalvo = localStorage.getItem('ff_invite_email') || '';
+        document.getElementById('completar-email').value = emailSalvo;
+        // Guardar oobCode para usar ao criar a conta
+        window._firebaseOobCode = params.get('oobCode');
+        window._firebaseApiKey = params.get('apiKey') || '';
         showScreen('screen-completar');
+        // Limpar parâmetros da URL
+        window.history.replaceState({}, document.title, window.location.pathname);
         return true;
       }
+
       return false;
     }
 
@@ -2770,11 +2789,20 @@
       if (btn) { btn.disabled = true; btn.textContent = 'Criando conta...'; }
 
       try {
-        const profile = await window.fbRegister(email, senha, nome);
+        let profile;
+
+        if (window.fbSignInWithEmailLink) {
+          // Usar o link do Firebase para autenticar e depois definir a senha
+          profile = await window.fbSignInWithEmailLink(email, senha, nome);
+        } else {
+          // Fallback: criar conta normalmente
+          profile = await window.fbRegister(email, senha, nome);
+        }
+
         DB.users.push(profile);
         saveDB(DB);
-        // Limpar parâmetros da URL sem recarregar
-        window.history.replaceState({}, document.title, window.location.pathname);
+        localStorage.removeItem('ff_invite_email');
+        window._firebaseOobCode = null;
         showScreen('screen-aguardando');
         showNotif('Conta criada! Aguarde a aprovação do admin 🎉', '✅');
       } catch (e) {
@@ -2782,6 +2810,7 @@
         let msg = 'Erro ao criar conta. Tente novamente.';
         if (e.code === 'auth/email-already-in-use') msg = 'Este e-mail já está cadastrado. Faça login!';
         if (e.code === 'auth/weak-password') msg = 'Senha muito fraca. Use ao menos 6 caracteres.';
+        if (e.code === 'auth/invalid-action-code') msg = 'Link expirado ou inválido. Solicite um novo.';
         showNotif(msg, '❌');
       } finally {
         if (btn) { btn.disabled = false; btn.textContent = '✦ Criar Conta'; }
@@ -4063,7 +4092,11 @@
     ================================ */
     window.addEventListener('DOMContentLoaded', () => {
       async function iniciarApp() {
-        // Verificar se é link de cadastro (?mode=cadastro&email=xxx)
+        // Garantir que login-page esteja visível
+        const loginPage = document.getElementById('login-page');
+        if (loginPage) loginPage.style.display = 'flex';
+
+        // Verificar se é link do Firebase (mode=signIn) ou link customizado
         if (verificarLinkCadastro()) return;
 
         // Sincronizar usuários do Firebase
@@ -4255,6 +4288,47 @@
     // Salvar registro pendente de convite
     window.fbSavePending = async (data) => {
       try { await setDoc(doc(fbDB, "invites", data.id), data); } catch (e) { console.error(e); }
+    };
+
+    // Completar cadastro via link do Firebase Email Link
+    window.fbSignInWithEmailLink = async (email, senha, nome) => {
+      const { signInWithEmailLink, isSignInWithEmailLink, updatePassword } =
+        await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+
+      // Verificar se a URL atual é um link de login do Firebase
+      const url = window.location.href;
+      let userCredential;
+
+      if (isSignInWithEmailLink(fbAuth, url)) {
+        // Link ainda na URL (caso raro — normalmente já limpamos antes)
+        userCredential = await signInWithEmailLink(fbAuth, email, url);
+      } else if (window._firebaseOobCode) {
+        // Reconstruir a URL de ação com o oobCode salvo
+        const actionUrl = `https://financeflow-5bed5.firebaseapp.com/__/auth/action?mode=signIn&oobCode=${window._firebaseOobCode}&apiKey=AIzaSyDVnSgV4ZOJ-HdFjt7TCgR1it8W-WeTOxQ`;
+        userCredential = await signInWithEmailLink(fbAuth, email, actionUrl);
+      } else {
+        // Fallback: criar conta normal
+        return await window.fbRegister(email, senha, nome);
+      }
+
+      // Definir a senha para o usuário poder logar depois
+      await updatePassword(userCredential.user, senha);
+
+      // Criar perfil no Firestore
+      const profile = {
+        id: userCredential.user.uid,
+        firebaseUid: userCredential.user.uid,
+        name: nome,
+        email: email,
+        role: 'comum',
+        isAdmin: false,
+        primeiroAcesso: false,
+        status: 'pendente',
+        cadastradoEm: new Date().toISOString()
+      };
+      await setDoc(doc(fbDB, "users", userCredential.user.uid), profile);
+      await signOut(fbAuth);
+      return profile;
     };
 
     // Enviar convite por e-mail usando Firebase Dynamic Links / Action URL

@@ -1177,7 +1177,143 @@
       font-size: 13px;
     }
 
-    /* ===== MOBILE OVERLAY ===== */
+    /* ===== QUICK NAV MENU ===== */
+.qnav-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 38px; height: 38px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  color: var(--text-2);
+  font-size: 18px;
+  transition: var(--transition);
+  flex-shrink: 0;
+  position: relative;
+}
+.qnav-btn:hover { border-color: var(--border-hover); color: var(--text-1); }
+
+.qnav-version {
+  position: absolute;
+  bottom: -6px; right: -6px;
+  background: var(--accent);
+  color: #000;
+  font-size: 8px;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 99px;
+  letter-spacing: .3px;
+}
+
+.qnav-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.4);
+  backdrop-filter: blur(4px);
+  z-index: 300;
+  display: none;
+  animation: fadeIn .2s ease;
+}
+.qnav-overlay.open { display: block; }
+
+.qnav-panel {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: 320px;
+  max-width: 90vw;
+  background: var(--bg-1);
+  border-left: 1px solid var(--border);
+  z-index: 301;
+  display: flex; flex-direction: column;
+  transform: translateX(110%);
+  transition: transform .28s cubic-bezier(.4,0,.2,1);
+  box-shadow: -8px 0 32px rgba(0,0,0,.3);
+}
+.qnav-panel.open { transform: translateX(0); }
+
+.qnav-header {
+  padding: 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.qnav-header-title {
+  font-family: var(--font-display);
+  font-size: 16px; font-weight: 700;
+  color: var(--text-1);
+}
+
+.qnav-close {
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--text-2);
+  font-size: 16px;
+  transition: var(--transition);
+}
+.qnav-close:hover { color: var(--text-1); border-color: var(--border-hover); }
+
+.qnav-body { flex: 1; overflow-y: auto; padding: 12px; }
+
+.qnav-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 10px 8px 6px;
+}
+
+.qnav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition);
+  color: var(--text-2);
+  font-size: 13px;
+}
+.qnav-item:hover { background: var(--bg-2); color: var(--text-1); }
+.qnav-item.active { background: rgba(0,229,190,.1); color: var(--accent); }
+
+.qnav-item-icon {
+  width: 32px; height: 32px;
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+  background: var(--bg-2);
+}
+.qnav-item.active .qnav-item-icon { background: rgba(0,229,190,.15); }
+
+.qnav-footer {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+}
+
+.qnav-version-badge {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  margin-bottom: 10px;
+}
+
+.qnav-logout {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  color: var(--danger);
+  font-size: 13px;
+  transition: var(--transition);
+}
+.qnav-logout:hover { background: rgba(255,90,90,.1); }
+
+/* ===== MOBILE OVERLAY ===== */
     .sidebar-overlay {
       display: none;
       position: fixed;
@@ -1536,7 +1672,18 @@
         </div>
         <button class="btn btn-primary" id="btn-login" onclick="doLogin()">✦ Entrar</button>
 
-        <div style="text-align:center;margin-top:20px">
+        <div style="display:flex;align-items:center;gap:12px;margin:20px 0">
+          <div style="flex:1;height:1px;background:var(--border)"></div>
+          <span style="font-size:12px;color:var(--text-3)">ou</span>
+          <div style="flex:1;height:1px;background:var(--border)"></div>
+        </div>
+
+        <button class="btn" id="btn-google" onclick="doLoginGoogle()" style="width:100%;background:var(--bg-2);border:1px solid var(--border);color:var(--text-1);padding:12px;gap:10px;font-size:14px;transition:var(--transition)" onmouseover="this.style.borderColor='var(--border-hover)'" onmouseout="this.style.borderColor='var(--border)'">
+          <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+          Entrar com Google
+        </button>
+
+        <div style="text-align:center;margin-top:16px">
           <span style="font-size:13px;color:var(--text-2)">Novo membro? </span>
           <span onclick="showScreen('screen-solicitar')"
             style="font-size:13px;color:var(--accent);cursor:pointer;font-weight:600">Solicitar acesso →</span>
@@ -1704,7 +1851,7 @@
           <div class="nav-sub-item" onclick="navigate('formas-pagamento')">Formas de Pagamento</div>
           <div class="nav-sub-item" onclick="navigate('efetivados')">Efetivados / Pendentes</div>
           <div class="nav-sub-item" onclick="navigate('gastos-fixos')">Gastos Fixos Mensais</div>
-          <div class="nav-sub-item" onclick="navigate('gastos-variaveis')">Gastos Variáveis</div>
+        <div class="nav-sub-item" onclick="navigate('gastos-variaveis')">Gastos Variáveis</div>
         </div>
 
         <!-- PLANEJAMENTO -->
@@ -1757,6 +1904,10 @@
         <button class="burger" onclick="toggleSidebar()">☰</button>
         <div class="topbar-title" id="topbar-title">Visão Geral</div>
         <div class="topbar-right">
+          <div class="qnav-btn" onclick="openQNav()" title="Menu de Navegação">
+            ☰
+            <span class="qnav-version">v1.0</span>
+          </div>
           <select class="period-selector" id="period-sel" onchange="refreshCharts()">
             <option value="jan">Janeiro 2025</option>
             <option value="feb">Fevereiro 2025</option>
@@ -2088,59 +2239,48 @@
         </section>
 
         <!-- ===================== GASTOS VARIÁVEIS ===================== -->
-        <section class="section" id="sec-gastos-variaveis">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-            <div>
-              <div style="font-family:var(--font-display);font-size:18px;font-weight:700">Gastos Variáveis</div>
-              <div style="font-size:13px;color:var(--text-2);margin-top:2px">Despesas que podem ou não ocorrer no mês
-              </div>
-            </div>
-            <button class="btn btn-accent" onclick="openModal('modal-lancamento')">+ Registrar Gasto</button>
+      <section class="section" id="sec-gastos-variaveis">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div>
+            <div style="font-family:var(--font-display);font-size:18px;font-weight:700">Gastos Variáveis</div>
+            <div style="font-size:13px;color:var(--text-2);margin-top:2px">Despesas que podem ou não ocorrer no mês</div>
           </div>
+          <button class="btn btn-accent" onclick="openModal('modal-lancamento')">+ Registrar Gasto</button>
+        </div>
 
-          <div class="kpi-grid" style="margin-bottom:16px">
-            <div class="kpi-card accent-red">
-              <div class="kpi-label">💸 Total Variáveis</div>
-              <div class="kpi-value" id="var-total">R$ 0</div>
-              <div class="kpi-change down" id="var-qtd">0 lançamentos</div>
-            </div>
-            <div class="kpi-card accent-yellow">
-              <div class="kpi-label">📊 Maior Gasto</div>
-              <div class="kpi-value" id="var-maior">R$ 0</div>
-              <div class="kpi-change" style="color:var(--text-2)" id="var-maior-desc">—</div>
-            </div>
-            <div class="kpi-card accent-purple">
-              <div class="kpi-label">🏷️ Categorias</div>
-              <div class="kpi-value" id="var-cats">0</div>
-              <div class="kpi-change" style="color:var(--text-2)">categorias distintas</div>
-            </div>
-            <div class="kpi-card accent-green">
-              <div class="kpi-label">📅 Média por Dia</div>
-              <div class="kpi-value" id="var-media-dia">R$ 0</div>
-              <div class="kpi-change" style="color:var(--text-2)">este mês</div>
-            </div>
+        <div class="kpi-grid" style="margin-bottom:16px">
+          <div class="kpi-card accent-red">
+            <div class="kpi-label">💸 Total Variáveis</div>
+            <div class="kpi-value" id="var-total">R$ 0</div>
+            <div class="kpi-change down" id="var-qtd">0 lançamentos</div>
           </div>
-
-          <div class="card">
-            <div class="card-title">📋 Lançamentos Variáveis do Mês</div>
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Data</th>
-                  <th>Descrição</th>
-                  <th>Categoria</th>
-                  <th>Forma Pag.</th>
-                  <th>Status</th>
-                  <th style="text-align:right">Valor</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody id="var-tbody"></tbody>
-            </table>
+          <div class="kpi-card accent-yellow">
+            <div class="kpi-label">📊 Maior Gasto</div>
+            <div class="kpi-value" id="var-maior">R$ 0</div>
+            <div class="kpi-change" style="color:var(--text-2)" id="var-maior-desc">—</div>
           </div>
-        </section>
+          <div class="kpi-card accent-purple">
+            <div class="kpi-label">🏷️ Categorias</div>
+            <div class="kpi-value" id="var-cats">0</div>
+            <div class="kpi-change" style="color:var(--text-2)">categorias distintas</div>
+          </div>
+          <div class="kpi-card accent-green">
+            <div class="kpi-label">📅 Média por Dia</div>
+            <div class="kpi-value" id="var-media-dia">R$ 0</div>
+            <div class="kpi-change" style="color:var(--text-2)">este mês</div>
+          </div>
+        </div>
 
-        <!-- ===================== ORÇADO VS REAL ===================== -->
+        <div class="card">
+          <div class="card-title">📋 Lançamentos Variáveis do Mês</div>
+          <table class="data-table">
+            <thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Forma Pag.</th><th>Status</th><th style="text-align:right">Valor</th><th>Ações</th></tr></thead>
+            <tbody id="var-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===================== ORÇADO VS REAL ===================== -->
         <section class="section" id="sec-orcado-real">
           <div class="card" style="margin-bottom:16px">
             <div class="card-title">📊 Orçado vs Real — <span id="orcado-mes">Maio 2025</span></div>
@@ -2507,51 +2647,206 @@
     </div>
   </div>
 
-  <!-- MODAL: EDITAR GASTO FIXO -->
-  <div class="modal-overlay" id="modal-fixo-edit">
-    <div class="modal">
-      <div class="modal-title">✏️ Editar Gasto Fixo</div>
-      <div class="modal-sub">Atualize as informações do gasto</div>
-      <input type="hidden" id="fixo-edit-id">
-      <div class="form-row form-row-1">
-        <div class="field">
-          <label>Descrição</label>
-          <input type="text" id="fixo-edit-desc" placeholder="Ex: Plano de Saúde">
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="field">
-          <label>Valor (R$)</label>
-          <input type="text" id="fixo-edit-valor" placeholder="0,00" inputmode="decimal" oninput="mascaraValor(this)">
-        </div>
-        <div class="field">
-          <label>Dia Vencimento</label>
-          <input type="number" id="fixo-edit-dia" min="1" max="31" value="10">
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="field">
-          <label>Categoria</label>
-          <select id="fixo-edit-cat"></select>
-        </div>
-        <div class="field">
-          <label>Forma de Pagamento</label>
-          <select id="fixo-edit-forma">
-            <option value="debito">Débito Automático</option>
-            <option value="boleto">Boleto</option>
-            <option value="pix">PIX</option>
-            <option value="credito">Cartão Crédito</option>
-          </select>
-        </div>
-      </div>
-      <div class="modal-actions">
-        <button class="btn btn-outline" onclick="closeModal('modal-fixo-edit')">Cancelar</button>
-        <button class="btn btn-accent" onclick="salvarFixoEdit()">Salvar Alterações</button>
-      </div>
+  <!-- QUICK NAV PANEL -->
+<div class="qnav-overlay" id="qnav-overlay" onclick="closeQNav()"></div>
+<div class="qnav-panel" id="qnav-panel">
+  <div class="qnav-header">
+    <div>
+      <div class="qnav-header-title">💰 FinanceFlow</div>
+      <div style="font-size:11px;color:var(--text-3);margin-top:2px">Navegação Rápida</div>
     </div>
+    <div class="qnav-close" onclick="closeQNav()">✕</div>
   </div>
 
-  <!-- MODAL: NOVO USUÁRIO -->
+  <div class="qnav-body">
+
+    <div class="qnav-section-label">📊 Análise Financeira</div>
+    <div class="qnav-item" onclick="qNavTo('visao-geral')">
+      <div class="qnav-item-icon">🏠</div>
+      <span>Visão Geral</span>
+    </div>
+    <div class="qnav-item" onclick="qNavTo('diagnostico')">
+      <div class="qnav-item-icon">🩺</div>
+      <span>Diagnóstico Financeiro</span>
+    </div>
+    <div class="qnav-item" onclick="qNavTo('evolucao')">
+      <div class="qnav-item-icon">📈</div>
+      <span>Evolução Mensal</span>
+    </div>
+    <div class="qnav-item" onclick="qNavTo('categorias')">
+      <div class="qnav-item-icon">🏷️</div>
+      <span>Categorias</span>
+    </div>
+    <div class="qnav-item" onclick="qNavTo('transporte')">
+      <div class="qnav-item-icon">🚗</div>
+      <span>Transporte</span>
+    </div>
+    <div class="qnav-item" onclick="qNavTo('cartao')">
+      <div class="qnav-item-icon">💳</div>
+      <span>Cartão / Parceiros</span>
+    </div>
+    <div class="qnav-item" onclick="qNavTo('formas-pagamento')">
+      <div class="qnav-item-icon">💰</div>
+      <span>Formas de Pagamento</span>
+    </div>
+    <div class="qnav-item" onclick="qNavTo('efetivados')">
+      <div class="qnav-item-icon">✅</div>
+      <span>Efetivados / Pendentes</span>
+    </div>
+    <div class="qnav-item" onclick="qNavTo('gastos-fixos')">
+      <div class="qnav-item-icon">🔁</div>
+      <span>Gastos Fixos Mensais</span>
+    </div>
+    <div class="qnav-item" onclick="qNavTo('gastos-variaveis')">
+      <div class="qnav-item-icon">💸</div>
+      <span>Gastos Variáveis</span>
+    </div>
+
+    <div class="qnav-section-label">🎯 Planejamento</div>
+    <div class="qnav-item" onclick="qNavTo('orcado-real')">
+      <div class="qnav-item-icon">📊</div>
+      <span>Orçado vs Real</span>
+    </div>
+    <div class="qnav-item" onclick="qNavTo('simulador')">
+      <div class="qnav-item-icon">🧮</div>
+      <span>Simulador</span>
+    </div>
+    <div class="qnav-item" onclick="qNavTo('metas')">
+      <div class="qnav-item-icon">🎯</div>
+      <span>Metas & Reserva</span>
+    </div>
+
+    <div class="qnav-section-label">📋 Dados</div>
+    <div class="qnav-item" onclick="openModal('modal-lancamento');closeQNav()">
+      <div class="qnav-item-icon">➕</div>
+      <span>+ Novo Lançamento</span>
+    </div>
+    <div class="qnav-item" onclick="qNavTo('lancamentos')">
+      <div class="qnav-item-icon">📋</div>
+      <span>Lançamentos</span>
+    </div>
+
+    <div class="qnav-section-label">⚙️ Configurações</div>
+    <div class="qnav-item" onclick="qNavTo('config-tema')">
+      <div class="qnav-item-icon">🎨</div>
+      <span>Tema Claro / Escuro</span>
+    </div>
+    <div class="qnav-item" onclick="qNavTo('config-usuarios')">
+      <div class="qnav-item-icon">👥</div>
+      <span>Usuários</span>
+    </div>
+    <div class="qnav-item" onclick="qNavTo('config-senha')">
+      <div class="qnav-item-icon">🔒</div>
+      <span>Alterar Senha</span>
+    </div>
+
+  </div>
+
+  <div class="qnav-footer">
+    <div class="qnav-version-badge">
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--text-1)">FinanceFlow</div>
+        <div style="font-size:11px;color:var(--text-3);margin-top:1px">Versão atual</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--accent)">v1.0.0</div>
+        <div style="font-size:10px;color:var(--text-3)">Junho 2026</div>
+      </div>
+    </div>
+    <div class="qnav-logout" onclick="doLogout()">
+      <span style="font-size:16px">🚪</span>
+      <span>Sair do aplicativo</span>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: BOAS-VINDAS / CONFIGURAÇÃO INICIAL -->
+<div class="modal-overlay" id="modal-boas-vindas">
+  <div class="modal" style="max-width:560px">
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="font-size:48px;margin-bottom:12px">👋</div>
+      <div class="modal-title" style="justify-content:center">Bem-vindo ao FinanceFlow!</div>
+      <div class="modal-sub" style="margin-bottom:0">Configure sua renda mensal para começar a usar o sistema</div>
+    </div>
+
+    <div style="background:var(--bg-2);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px">
+      <div class="form-row form-row-1" style="margin-bottom:0">
+        <div class="field">
+          <label>💰 Qual é a sua renda mensal? (R$)</label>
+          <input type="text" id="renda-inicial" placeholder="Ex: 5.000,00" inputmode="decimal"
+            oninput="mascaraValor(this);atualizarPreviewOrcamento(parseValor(this.value))" 
+            style="font-size:18px;font-weight:600;text-align:center"
+            onkeydown="if(event.key==='Enter')salvarRendaInicial()">
+          <div style="font-size:12px;color:var(--text-3);margin-top:6px;text-align:center">
+            Isso será usado como base para calcular seu orçamento disponível
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--bg-2);border-radius:var(--radius-lg);padding:16px;margin-bottom:20px">
+      <div style="font-size:12px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">
+        Distribuição sugerida (regra 50/30/20)
+      </div>
+      <div id="preview-orcamento" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+
+    <div style="font-size:12px;color:var(--text-3);text-align:center;margin-bottom:20px">
+      💡 Você pode ajustar esses valores depois em <strong>Planejamento → Orçado vs Real</strong>
+    </div>
+
+    <div class="modal-actions" style="justify-content:center">
+      <button class="btn btn-outline" onclick="closeModal('modal-boas-vindas');marcarConfigurado()">Pular por agora</button>
+      <button class="btn btn-accent" onclick="salvarRendaInicial()" style="padding:12px 32px">Começar →</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: EDITAR GASTO FIXO -->
+<div class="modal-overlay" id="modal-fixo-edit">
+  <div class="modal">
+    <div class="modal-title">✏️ Editar Gasto Fixo</div>
+    <div class="modal-sub">Atualize as informações do gasto</div>
+    <input type="hidden" id="fixo-edit-id">
+    <div class="form-row form-row-1">
+      <div class="field">
+        <label>Descrição</label>
+        <input type="text" id="fixo-edit-desc" placeholder="Ex: Plano de Saúde">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label>Valor (R$)</label>
+        <input type="text" id="fixo-edit-valor" placeholder="0,00" inputmode="decimal" oninput="mascaraValor(this)">
+      </div>
+      <div class="field">
+        <label>Dia Vencimento</label>
+        <input type="number" id="fixo-edit-dia" min="1" max="31" value="10">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label>Categoria</label>
+        <select id="fixo-edit-cat"></select>
+      </div>
+      <div class="field">
+        <label>Forma de Pagamento</label>
+        <select id="fixo-edit-forma">
+          <option value="debito">Débito Automático</option>
+          <option value="boleto">Boleto</option>
+          <option value="pix">PIX</option>
+          <option value="credito">Cartão Crédito</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modal-fixo-edit')">Cancelar</button>
+      <button class="btn btn-accent" onclick="salvarFixoEdit()">Salvar Alterações</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: NOVO USUÁRIO -->
   <div class="modal-overlay" id="modal-user">
     <div class="modal">
       <div class="modal-title">👤 Cadastrar Usuário</div>
@@ -2660,9 +2955,11 @@
         gastos_fixos,
         metas,
         orcamentos: {
-          alimentacao: 800, moradia: 2500, transporte: 500,
-          saude: 600, lazer: 300, educacao: 1000, tecnologia: 500, outros: 300
+          alimentacao: 0, moradia: 0, transporte: 0,
+          saude: 0, lazer: 0, educacao: 0, tecnologia: 0, outros: 0
         },
+        rendaMensal: 0,
+        configurado: false,
         theme: 'dark'
       };
       saveDB(db);
@@ -2688,6 +2985,126 @@
     function validarEmail(email) {
       const re = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
       return re.test(email);
+    }
+
+    /* ===============================
+       QUICK NAV MENU
+    ================================ */
+    const APP_VERSION = 'v1.0.0';
+
+    function openQNav() {
+      // Atualizar item ativo
+      document.querySelectorAll('.qnav-item').forEach(el => {
+        const onclick = el.getAttribute('onclick') || '';
+        el.classList.toggle('active', onclick.includes(`'${currentSection}'`));
+      });
+      document.getElementById('qnav-overlay').classList.add('open');
+      document.getElementById('qnav-panel').classList.add('open');
+    }
+
+    function closeQNav() {
+      document.getElementById('qnav-overlay').classList.remove('open');
+      document.getElementById('qnav-panel').classList.remove('open');
+    }
+
+    function qNavTo(sec) {
+      closeQNav();
+      setTimeout(() => navigate(sec), 180);
+    }
+
+    // Fechar com tecla ESC
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeQNav();
+    });
+
+    /* ===============================
+       BOAS-VINDAS / CONFIGURAÇÃO INICIAL
+    ================================ */
+
+    function abrirBoasVindas() {
+      // Mostrar preview zerado
+      atualizarPreviewOrcamento(0);
+      openModal('modal-boas-vindas');
+      setTimeout(() => document.getElementById('renda-inicial')?.focus(), 300);
+    }
+
+    function atualizarPreviewOrcamento(renda) {
+      const el = document.getElementById('preview-orcamento');
+      if (!el) return;
+      // Regra 50/30/20: 50% necessidades, 30% desejos, 20% poupança
+      const itens = [
+        { label: '🏠 Moradia + Contas fixas',  pct: 35, cat: 'moradia',      cor: '#6C9EFF' },
+        { label: '🍽️ Alimentação',             pct: 15, cat: 'alimentacao',  cor: '#FF9A3C' },
+        { label: '🚗 Transporte',              pct: 10, cat: 'transporte',   cor: '#FFB347' },
+        { label: '💊 Saúde',                   pct: 10, cat: 'saude',        cor: '#FF6B6B' },
+        { label: '🎮 Lazer',                   pct: 10, cat: 'lazer',        cor: '#A78BFA' },
+        { label: '📚 Educação',                pct: 10, cat: 'educacao',     cor: '#34D399' },
+        { label: '💻 Tecnologia',              pct: 5,  cat: 'tecnologia',   cor: '#38BDF8' },
+        { label: '📦 Outros',                  pct: 5,  cat: 'outros',       cor: '#94A3B8' },
+      ];
+      el.innerHTML = itens.map(item => {
+        const val = Math.round(renda * item.pct / 100);
+        return `
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:12px;color:var(--text-2);flex:1">${item.label}</span>
+            <span style="font-size:11px;color:var(--text-3)">${item.pct}%</span>
+            <span style="font-size:13px;font-weight:600;color:var(--text-1);min-width:80px;text-align:right">${fmt(val)}</span>
+          </div>`;
+      }).join('');
+    }
+
+    function salvarRendaInicial() {
+      const renda = parseValor(document.getElementById('renda-inicial')?.value);
+      if (!renda || renda <= 0) {
+        showNotif('Informe sua renda mensal', '⚠️');
+        return;
+      }
+
+      // Calcular orçamentos baseados na renda (regra proporcional)
+      DB.orcamentos = {
+        moradia:     Math.round(renda * 0.35),
+        alimentacao: Math.round(renda * 0.15),
+        transporte:  Math.round(renda * 0.10),
+        saude:       Math.round(renda * 0.10),
+        lazer:       Math.round(renda * 0.10),
+        educacao:    Math.round(renda * 0.10),
+        tecnologia:  Math.round(renda * 0.05),
+        outros:      Math.round(renda * 0.05),
+      };
+      DB.rendaMensal = renda;
+      DB.configurado = true;
+      saveDB(DB);
+
+      // Salvar no Firebase
+      if (window.fbSaveOrcamentos && DB.currentUser?.id) {
+        window.fbSaveOrcamentos(DB.currentUser.id, DB.orcamentos);
+      }
+
+      closeModal('modal-boas-vindas');
+      showNotif('✅ Renda configurada! Orçamentos calculados automaticamente.', '✅');
+
+      // Criar lançamento de receita com a renda
+      const hoje = new Date().toISOString().split('T')[0];
+      const lancRenda = {
+        id: uid(), data: hoje,
+        desc: 'Renda Mensal',
+        tipo: 'receita', valor: renda,
+        cat: 'receita', forma: 'ted',
+        status: 'efetivado', parc: null
+      };
+      DB.lancamentos.push(lancRenda);
+      saveDB(DB);
+      if (window.fbSaveLancamento && DB.currentUser?.id) {
+        window.fbSaveLancamento(DB.currentUser.id, lancRenda);
+      }
+
+      // Recarregar visão geral
+      navigate('visao-geral');
+    }
+
+    function marcarConfigurado() {
+      DB.configurado = true;
+      saveDB(DB);
     }
 
     // Máscara de valor monetário
@@ -2751,6 +3168,125 @@
     function validarEmail(email) {
       const re = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
       return re.test(email);
+    }
+
+    /* ===============================
+       QUICK NAV MENU
+    ================================ */
+
+    function openQNav() {
+      // Atualizar item ativo
+      document.querySelectorAll('.qnav-item').forEach(el => {
+        const onclick = el.getAttribute('onclick') || '';
+        el.classList.toggle('active', onclick.includes(`'${currentSection}'`));
+      });
+      document.getElementById('qnav-overlay').classList.add('open');
+      document.getElementById('qnav-panel').classList.add('open');
+    }
+
+    function closeQNav() {
+      document.getElementById('qnav-overlay').classList.remove('open');
+      document.getElementById('qnav-panel').classList.remove('open');
+    }
+
+    function qNavTo(sec) {
+      closeQNav();
+      setTimeout(() => navigate(sec), 180);
+    }
+
+    // Fechar com tecla ESC
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeQNav();
+    });
+
+    /* ===============================
+       BOAS-VINDAS / CONFIGURAÇÃO INICIAL
+    ================================ */
+
+    function abrirBoasVindas() {
+      // Mostrar preview zerado
+      atualizarPreviewOrcamento(0);
+      openModal('modal-boas-vindas');
+      setTimeout(() => document.getElementById('renda-inicial')?.focus(), 300);
+    }
+
+    function atualizarPreviewOrcamento(renda) {
+      const el = document.getElementById('preview-orcamento');
+      if (!el) return;
+      // Regra 50/30/20: 50% necessidades, 30% desejos, 20% poupança
+      const itens = [
+        { label: '🏠 Moradia + Contas fixas',  pct: 35, cat: 'moradia',      cor: '#6C9EFF' },
+        { label: '🍽️ Alimentação',             pct: 15, cat: 'alimentacao',  cor: '#FF9A3C' },
+        { label: '🚗 Transporte',              pct: 10, cat: 'transporte',   cor: '#FFB347' },
+        { label: '💊 Saúde',                   pct: 10, cat: 'saude',        cor: '#FF6B6B' },
+        { label: '🎮 Lazer',                   pct: 10, cat: 'lazer',        cor: '#A78BFA' },
+        { label: '📚 Educação',                pct: 10, cat: 'educacao',     cor: '#34D399' },
+        { label: '💻 Tecnologia',              pct: 5,  cat: 'tecnologia',   cor: '#38BDF8' },
+        { label: '📦 Outros',                  pct: 5,  cat: 'outros',       cor: '#94A3B8' },
+      ];
+      el.innerHTML = itens.map(item => {
+        const val = Math.round(renda * item.pct / 100);
+        return `
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:12px;color:var(--text-2);flex:1">${item.label}</span>
+            <span style="font-size:11px;color:var(--text-3)">${item.pct}%</span>
+            <span style="font-size:13px;font-weight:600;color:var(--text-1);min-width:80px;text-align:right">${fmt(val)}</span>
+          </div>`;
+      }).join('');
+    }
+
+    function salvarRendaInicial() {
+      const renda = parseValor(document.getElementById('renda-inicial')?.value);
+      if (!renda || renda <= 0) {
+        showNotif('Informe sua renda mensal', '⚠️');
+        return;
+      }
+
+      // Calcular orçamentos baseados na renda (regra proporcional)
+      DB.orcamentos = {
+        moradia:     Math.round(renda * 0.35),
+        alimentacao: Math.round(renda * 0.15),
+        transporte:  Math.round(renda * 0.10),
+        saude:       Math.round(renda * 0.10),
+        lazer:       Math.round(renda * 0.10),
+        educacao:    Math.round(renda * 0.10),
+        tecnologia:  Math.round(renda * 0.05),
+        outros:      Math.round(renda * 0.05),
+      };
+      DB.rendaMensal = renda;
+      DB.configurado = true;
+      saveDB(DB);
+
+      // Salvar no Firebase
+      if (window.fbSaveOrcamentos && DB.currentUser?.id) {
+        window.fbSaveOrcamentos(DB.currentUser.id, DB.orcamentos);
+      }
+
+      closeModal('modal-boas-vindas');
+      showNotif('✅ Renda configurada! Orçamentos calculados automaticamente.', '✅');
+
+      // Criar lançamento de receita com a renda
+      const hoje = new Date().toISOString().split('T')[0];
+      const lancRenda = {
+        id: uid(), data: hoje,
+        desc: 'Renda Mensal',
+        tipo: 'receita', valor: renda,
+        cat: 'receita', forma: 'ted',
+        status: 'efetivado', parc: null
+      };
+      DB.lancamentos.push(lancRenda);
+      saveDB(DB);
+      if (window.fbSaveLancamento && DB.currentUser?.id) {
+        window.fbSaveLancamento(DB.currentUser.id, lancRenda);
+      }
+
+      // Recarregar visão geral
+      navigate('visao-geral');
+    }
+
+    function marcarConfigurado() {
+      DB.configurado = true;
+      saveDB(DB);
     }
 
     // Máscara de valor monetário
@@ -2861,6 +3397,125 @@
     function validarEmail(email) {
       const re = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
       return re.test(email);
+    }
+
+    /* ===============================
+       QUICK NAV MENU
+    ================================ */
+
+    function openQNav() {
+      // Atualizar item ativo
+      document.querySelectorAll('.qnav-item').forEach(el => {
+        const onclick = el.getAttribute('onclick') || '';
+        el.classList.toggle('active', onclick.includes(`'${currentSection}'`));
+      });
+      document.getElementById('qnav-overlay').classList.add('open');
+      document.getElementById('qnav-panel').classList.add('open');
+    }
+
+    function closeQNav() {
+      document.getElementById('qnav-overlay').classList.remove('open');
+      document.getElementById('qnav-panel').classList.remove('open');
+    }
+
+    function qNavTo(sec) {
+      closeQNav();
+      setTimeout(() => navigate(sec), 180);
+    }
+
+    // Fechar com tecla ESC
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeQNav();
+    });
+
+    /* ===============================
+       BOAS-VINDAS / CONFIGURAÇÃO INICIAL
+    ================================ */
+
+    function abrirBoasVindas() {
+      // Mostrar preview zerado
+      atualizarPreviewOrcamento(0);
+      openModal('modal-boas-vindas');
+      setTimeout(() => document.getElementById('renda-inicial')?.focus(), 300);
+    }
+
+    function atualizarPreviewOrcamento(renda) {
+      const el = document.getElementById('preview-orcamento');
+      if (!el) return;
+      // Regra 50/30/20: 50% necessidades, 30% desejos, 20% poupança
+      const itens = [
+        { label: '🏠 Moradia + Contas fixas',  pct: 35, cat: 'moradia',      cor: '#6C9EFF' },
+        { label: '🍽️ Alimentação',             pct: 15, cat: 'alimentacao',  cor: '#FF9A3C' },
+        { label: '🚗 Transporte',              pct: 10, cat: 'transporte',   cor: '#FFB347' },
+        { label: '💊 Saúde',                   pct: 10, cat: 'saude',        cor: '#FF6B6B' },
+        { label: '🎮 Lazer',                   pct: 10, cat: 'lazer',        cor: '#A78BFA' },
+        { label: '📚 Educação',                pct: 10, cat: 'educacao',     cor: '#34D399' },
+        { label: '💻 Tecnologia',              pct: 5,  cat: 'tecnologia',   cor: '#38BDF8' },
+        { label: '📦 Outros',                  pct: 5,  cat: 'outros',       cor: '#94A3B8' },
+      ];
+      el.innerHTML = itens.map(item => {
+        const val = Math.round(renda * item.pct / 100);
+        return `
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:12px;color:var(--text-2);flex:1">${item.label}</span>
+            <span style="font-size:11px;color:var(--text-3)">${item.pct}%</span>
+            <span style="font-size:13px;font-weight:600;color:var(--text-1);min-width:80px;text-align:right">${fmt(val)}</span>
+          </div>`;
+      }).join('');
+    }
+
+    function salvarRendaInicial() {
+      const renda = parseValor(document.getElementById('renda-inicial')?.value);
+      if (!renda || renda <= 0) {
+        showNotif('Informe sua renda mensal', '⚠️');
+        return;
+      }
+
+      // Calcular orçamentos baseados na renda (regra proporcional)
+      DB.orcamentos = {
+        moradia:     Math.round(renda * 0.35),
+        alimentacao: Math.round(renda * 0.15),
+        transporte:  Math.round(renda * 0.10),
+        saude:       Math.round(renda * 0.10),
+        lazer:       Math.round(renda * 0.10),
+        educacao:    Math.round(renda * 0.10),
+        tecnologia:  Math.round(renda * 0.05),
+        outros:      Math.round(renda * 0.05),
+      };
+      DB.rendaMensal = renda;
+      DB.configurado = true;
+      saveDB(DB);
+
+      // Salvar no Firebase
+      if (window.fbSaveOrcamentos && DB.currentUser?.id) {
+        window.fbSaveOrcamentos(DB.currentUser.id, DB.orcamentos);
+      }
+
+      closeModal('modal-boas-vindas');
+      showNotif('✅ Renda configurada! Orçamentos calculados automaticamente.', '✅');
+
+      // Criar lançamento de receita com a renda
+      const hoje = new Date().toISOString().split('T')[0];
+      const lancRenda = {
+        id: uid(), data: hoje,
+        desc: 'Renda Mensal',
+        tipo: 'receita', valor: renda,
+        cat: 'receita', forma: 'ted',
+        status: 'efetivado', parc: null
+      };
+      DB.lancamentos.push(lancRenda);
+      saveDB(DB);
+      if (window.fbSaveLancamento && DB.currentUser?.id) {
+        window.fbSaveLancamento(DB.currentUser.id, lancRenda);
+      }
+
+      // Recarregar visão geral
+      navigate('visao-geral');
+    }
+
+    function marcarConfigurado() {
+      DB.configurado = true;
+      saveDB(DB);
     }
 
     // Máscara de valor monetário
@@ -3012,6 +3667,39 @@
       }
     }
 
+    // LOGIN COM GOOGLE
+    async function doLoginGoogle() {
+      const btn = document.getElementById('btn-google');
+      if (btn) { btn.disabled = true; btn.textContent = 'Aguarde...'; }
+      try {
+        if (!window.fbLoginGoogle) throw new Error('Firebase não inicializado');
+        const profile = await window.fbLoginGoogle();
+        if (profile.status === 'pendente') {
+          showNotif('⏳ Cadastro enviado! Aguarde aprovação do administrador.', '⏳');
+          showScreen('screen-aguardando');
+          return;
+        }
+        if (profile.status === 'rejeitado') {
+          showNotif('❌ Seu acesso foi negado pelo administrador.', '❌');
+          return;
+        }
+        const lembrar = document.getElementById('lembrar-me')?.checked || false;
+        if (lembrar) localStorage.setItem('ff_session', JSON.stringify({ userId: profile.id }));
+        DB.currentUser = profile;
+        saveDB(DB);
+        enterApp(profile);
+      } catch(e) {
+        console.error('Google login error:', e.code, e.message);
+        let msg = 'Erro ao entrar com Google.';
+        if (e.code === 'auth/popup-closed-by-user')   msg = 'Login cancelado.';
+        if (e.code === 'auth/popup-blocked')           msg = 'Popup bloqueado. Permita popups para este site.';
+        if (e.code === 'auth/account-exists-with-different-credential') msg = 'E-mail já cadastrado com outro método.';
+        showNotif(msg + ' (' + (e.code || '') + ')', '❌');
+      } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> Entrar com Google'; }
+      }
+    }
+
     // LOGIN
     async function doLogin() {
       const email = document.getElementById('login-email').value.trim();
@@ -3066,14 +3754,14 @@
       } catch (e) {
         console.error('LOGIN ERROR:', e.code, e.message);
         let msg = 'E-mail ou senha incorretos';
-        if (e.code === 'auth/too-many-requests') msg = 'Muitas tentativas. Aguarde alguns minutos.';
-        if (e.code === 'auth/user-disabled') msg = 'Esta conta foi desativada.';
-        if (e.code === 'auth/user-not-found') msg = 'E-mail não cadastrado no sistema.';
-        if (e.code === 'auth/wrong-password') msg = 'Senha incorreta. Tente novamente.';
-        if (e.code === 'auth/invalid-credential') msg = 'Credenciais inválidas. Verifique e-mail e senha.';
-        if (e.code === 'auth/invalid-email') msg = 'Formato de e-mail inválido.';
+        if (e.code === 'auth/too-many-requests')   msg = 'Muitas tentativas. Aguarde alguns minutos.';
+        if (e.code === 'auth/user-disabled')        msg = 'Esta conta foi desativada.';
+        if (e.code === 'auth/user-not-found')       msg = 'E-mail não cadastrado no sistema.';
+        if (e.code === 'auth/wrong-password')       msg = 'Senha incorreta. Tente novamente.';
+        if (e.code === 'auth/invalid-credential')   msg = 'Credenciais inválidas. Verifique e-mail e senha.';
+        if (e.code === 'auth/invalid-email')        msg = 'Formato de e-mail inválido.';
         if (e.code === 'auth/network-request-failed') msg = 'Erro de conexão. Verifique sua internet.';
-        if (e.message === 'Perfil não encontrado') msg = 'Perfil não encontrado. Entre em contato com o admin.';
+        if (e.message === 'Perfil não encontrado')  msg = 'Perfil não encontrado. Entre em contato com o admin.';
         showNotif(msg + ' (' + (e.code || e.message) + ')', '❌');
       } finally {
         if (btn) { btn.disabled = false; btn.textContent = '✦ Entrar'; }
@@ -3185,7 +3873,7 @@
             if (dados.orcamentos) DB.orcamentos = dados.orcamentos;
             saveDB(DB);
           }
-        } catch (e) {
+        } catch(e) {
           console.error('Erro ao carregar dados do Firebase:', e);
         }
       }
@@ -3194,6 +3882,11 @@
       initSidebarOpen();
       atualizarBadgePendentes();
       navigate('visao-geral');
+
+      // Exibir boas-vindas se usuário ainda não configurou a renda
+      if (!DB.configurado) {
+        setTimeout(() => abrirBoasVindas(), 600);
+      }
     }
 
     /* ===============================
@@ -3305,15 +3998,16 @@
       const totalRec = sum(rec);
       const saldo = totalRec - totalDesp;
       const totalOrc = Object.values(DB.orcamentos).reduce((a, b) => a + b, 0);
-      const pct = Math.min(100, Math.round(totalDesp / totalOrc * 100));
-      const resta = Math.max(0, totalOrc - totalDesp);
+      const temOrcamento = totalOrc > 0;
+      const pct = temOrcamento ? Math.min(100, Math.round(totalDesp / totalOrc * 100)) : 0;
+      const resta = temOrcamento ? Math.max(0, totalOrc - totalDesp) : 0;
       const fixos = sum(DB.gastos_fixos);
 
       // Hero ring
       document.getElementById('hero-gasto').textContent = fmt(totalDesp);
       document.getElementById('hero-orcamento').textContent = fmt(totalOrc);
-      document.getElementById('hero-pct').textContent = `${pct}% utilizado`;
-      document.getElementById('hero-resta').textContent = fmt(resta);
+      document.getElementById('hero-pct').textContent = temOrcamento ? `${pct}% utilizado` : 'Orçamento não configurado';
+      document.getElementById('hero-resta').textContent = temOrcamento ? fmt(resta) : '—';
 
       document.getElementById('kpi-saldo').textContent = fmt(saldo);
       document.getElementById('kpi-receitas').textContent = fmt(totalRec);
@@ -3355,7 +4049,7 @@
       // Dados reais dos últimos 6 meses
       const now6 = new Date();
       const recData = [], despData = [], months6 = [];
-      const MN = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+      const MN = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
       for (let i = 5; i >= 0; i--) {
         const d = new Date(now6.getFullYear(), now6.getMonth() - i, 1);
         months6.push(MN[d.getMonth()]);
@@ -3373,7 +4067,7 @@
         chartInstances['evo'] = new Chart(evoCtx, {
           type: 'line',
           data: {
-            labels: months6, datasets: [
+                        labels: months6, datasets: [
               { label: 'Receitas', data: recData, borderColor: '#00C896', backgroundColor: 'rgba(0,200,150,.1)', fill: true, tension: .4, pointBackgroundColor: '#00C896', pointRadius: 4 },
               { label: 'Despesas', data: despData, borderColor: '#FF5A5A', backgroundColor: 'rgba(255,90,90,.08)', fill: true, tension: .4, pointBackgroundColor: '#FF5A5A', pointRadius: 4, borderDash: [0] }
             ]
@@ -3537,7 +4231,7 @@
       const months = [];
       const rec = [];
       const desp = [];
-      const MONTH_NAMES = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+      const MONTH_NAMES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
       for (let i = 5; i >= 0; i--) {
         const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
         const m = d.getMonth();
@@ -3636,12 +4330,12 @@
       const list = getDespesas(getLancamentosMes()).filter(l => l.cat === 'transporte');
 
       // Classificação por palavras-chave na descrição OU subcat
-      const isApp = l => ['uber', '99', 'cabify', '99pop', 'ifood', 'lyft', 'bolt'].some(k => l.desc.toLowerCase().includes(k)) || l.subcat === 'app';
-      const isPub = l => ['metro', 'ônibus', 'onibus', 'bus', 'trem', 'brt', 'van'].some(k => l.desc.toLowerCase().includes(k)) || l.subcat === 'pub';
-      const isComb = l => ['combustível', 'combustivel', 'gasolina', 'etanol', 'diesel', 'alcool', 'posto'].some(k => l.desc.toLowerCase().includes(k)) || l.subcat === 'comb';
+      const isApp   = l => ['uber','99','cabify','99pop','ifood','lyft','bolt'].some(k => l.desc.toLowerCase().includes(k)) || l.subcat === 'app';
+      const isPub   = l => ['metro','ônibus','onibus','bus','trem','brt','van'].some(k => l.desc.toLowerCase().includes(k)) || l.subcat === 'pub';
+      const isComb  = l => ['combustível','combustivel','gasolina','etanol','diesel','alcool','posto'].some(k => l.desc.toLowerCase().includes(k)) || l.subcat === 'comb';
 
-      const app = list.filter(l => isApp(l));
-      const pub = list.filter(l => !isApp(l) && isPub(l));
+      const app  = list.filter(l => isApp(l));
+      const pub  = list.filter(l => !isApp(l) && isPub(l));
       const comb = list.filter(l => !isApp(l) && !isPub(l) && isComb(l));
       const other = list.filter(l => !isApp(l) && !isPub(l) && !isComb(l));
 
@@ -3820,11 +4514,11 @@
     }
 
     function salvarFixoEdit() {
-      const id = document.getElementById('fixo-edit-id').value;
-      const desc = document.getElementById('fixo-edit-desc').value.trim();
+      const id    = document.getElementById('fixo-edit-id').value;
+      const desc  = document.getElementById('fixo-edit-desc').value.trim();
       const valor = parseValor(document.getElementById('fixo-edit-valor').value);
-      const dia = parseInt(document.getElementById('fixo-edit-dia').value) || 10;
-      const cat = document.getElementById('fixo-edit-cat').value;
+      const dia   = parseInt(document.getElementById('fixo-edit-dia').value) || 10;
+      const cat   = document.getElementById('fixo-edit-cat').value;
       const forma = document.getElementById('fixo-edit-forma').value;
       if (!desc || !valor) { showNotif('Preencha todos os campos', '⚠️'); return; }
       const g = DB.gastos_fixos.find(x => x.id === id);
@@ -4150,7 +4844,7 @@
             DB.users = fbUsers;
             saveDB(DB);
           }
-        } catch (e) { console.error('renderUsers fbGetUsers:', e); }
+        } catch(e) { console.error('renderUsers fbGetUsers:', e); }
       }
 
       const isCurrentAdmin = DB.currentUser?.isAdmin === true;
@@ -4404,26 +5098,59 @@
     /* ===============================
        CADASTRAR USUÁRIO
     ================================ */
-    function cadastrarUsuario() {
-      const name = document.getElementById('new-user-name').value.trim();
+    async function cadastrarUsuario() {
+      const name  = document.getElementById('new-user-name').value.trim();
       const email = document.getElementById('new-user-email').value.trim();
-      const pass = document.getElementById('new-user-pass').value;
-      const role = document.getElementById('new-user-role').value;
+      const pass  = document.getElementById('new-user-pass').value;
 
       if (!name || !email || !pass) { showNotif('Preencha todos os campos', '⚠️'); return; }
       if (!validarEmail(email)) { showNotif('Informe um e-mail válido. Ex: nome@email.com', '⚠️'); return; }
+      if (pass.length < 6) { showNotif('Senha mínima de 6 caracteres', '⚠️'); return; }
+      if (!DB.currentUser?.isAdmin) { showNotif('Apenas o admin pode cadastrar usuários!', '⚠️'); return; }
       if (DB.users.find(u => u.email === email)) { showNotif('E-mail já cadastrado', '⚠️'); return; }
 
-      if (!DB.currentUser?.isAdmin) { showNotif('Apenas o admin pode cadastrar usuários!', '⚠️'); return; }
-      DB.users.push({ id: uid(), name, email, pass: hashPass(pass), role: 'comum', isAdmin: false, primeiroAcesso: true });
-      saveDB(DB);
-      closeModal('modal-user');
-      showNotif('Usuário ' + name + ' criado! Senha temporária: ' + pass, '✅');
-      renderUsers();
+      const btn = document.querySelector('#modal-user .btn-accent');
+      if (btn) { btn.disabled = true; btn.textContent = 'Cadastrando...'; }
 
-      document.getElementById('new-user-name').value = '';
-      document.getElementById('new-user-email').value = '';
-      document.getElementById('new-user-pass').value = '';
+      try {
+        let profile;
+
+        if (window.fbCreateUserByAdmin) {
+          // Criar usuário no Firebase Auth (usando app secundário para não deslogar o admin)
+          profile = await window.fbCreateUserByAdmin(email, pass, name);
+        } else {
+          // Fallback local
+          profile = {
+            id: uid(), name, email,
+            pass: hashPass(pass),
+            role: 'comum', isAdmin: false,
+            primeiroAcesso: true, status: 'aprovado',
+            cadastradoEm: new Date().toISOString()
+          };
+          if (window.fbSaveUser) await window.fbSaveUser(profile);
+        }
+
+        // Atualizar lista local
+        DB.users.push(profile);
+        saveDB(DB);
+        closeModal('modal-user');
+        showNotif('✅ Usuário ' + name + ' criado! Senha: ' + pass, '✅');
+        renderUsers();
+
+        document.getElementById('new-user-name').value = '';
+        document.getElementById('new-user-email').value = '';
+        document.getElementById('new-user-pass').value = '';
+
+      } catch(e) {
+        console.error('cadastrarUsuario:', e.code, e.message);
+        let msg = 'Erro ao criar usuário.';
+        if (e.code === 'auth/email-already-in-use') msg = 'E-mail já cadastrado no sistema.';
+        if (e.code === 'auth/weak-password')        msg = 'Senha muito fraca. Use ao menos 6 caracteres.';
+        if (e.code === 'auth/invalid-email')        msg = 'E-mail inválido.';
+        showNotif(msg, '❌');
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = 'Cadastrar'; }
+      }
     }
 
     /* ===============================
@@ -4588,230 +5315,262 @@
     });
   </script>
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, doc, setDoc, getDoc, collection, getDocs, onSnapshot, deleteDoc, query, where, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, signOut, updatePassword, reauthenticateWithCredential, EmailAuthProvider, isSignInWithEmailLink, signInWithEmailLink } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc, collection, getDocs, onSnapshot, deleteDoc, query, where, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, signOut, updatePassword, reauthenticateWithCredential, EmailAuthProvider, isSignInWithEmailLink, signInWithEmailLink, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDVnSgV4ZOJ-HdFjt7TCgR1it8W-WeTOxQ",
-      authDomain: "financeflow-5bed5.firebaseapp.com",
-      projectId: "financeflow-5bed5",
-      storageBucket: "financeflow-5bed5.firebasestorage.app",
-      messagingSenderId: "741637396796",
-      appId: "1:741637396796:web:5853e8bb0689287f11a639"
+const firebaseConfig = {
+  apiKey: "AIzaSyDVnSgV4ZOJ-HdFjt7TCgR1it8W-WeTOxQ",
+  authDomain: "financeflow-5bed5.firebaseapp.com",
+  projectId: "financeflow-5bed5",
+  storageBucket: "financeflow-5bed5.firebasestorage.app",
+  messagingSenderId: "741637396796",
+  appId: "1:741637396796:web:5853e8bb0689287f11a639"
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+const fbDB = getFirestore(firebaseApp);
+const fbAuth = getAuth(firebaseApp);
+
+// ========== HELPERS PATHS ==========
+// Cada usuário tem sua própria subcolecão: users/{uid}/lancamentos, etc.
+const userCol = (uid, col) => collection(fbDB, "users", uid, col);
+const userDoc = (uid, col, id) => doc(fbDB, "users", uid, col, id);
+
+// ========== USUÁRIOS ==========
+window.fbSaveUser = async (user) => {
+  try { await setDoc(doc(fbDB, "users", user.id), user, { merge: true }); } catch(e) { console.error("fbSaveUser:", e); }
+};
+window.fbDeleteUser = async (userId) => {
+  try { await deleteDoc(doc(fbDB, "users", userId)); } catch(e) { console.error("fbDeleteUser:", e); }
+};
+window.fbGetUsers = async () => {
+  try {
+    const snap = await getDocs(collection(fbDB, "users"));
+    return snap.docs.map(d => d.data()).filter(u => u.email);
+  } catch(e) { console.error("fbGetUsers:", e); return []; }
+};
+window.fbListenUsers = (callback) => {
+  return onSnapshot(collection(fbDB, "users"), (snap) => {
+    callback(snap.docs.map(d => d.data()).filter(u => u.email));
+  });
+};
+
+// ========== DADOS DO USUÁRIO (isolados por uid) ==========
+
+// Salvar um lançamento
+window.fbSaveLancamento = async (uid, lancamento) => {
+  try { await setDoc(userDoc(uid, "lancamentos", lancamento.id), lancamento); } catch(e) { console.error("fbSaveLancamento:", e); }
+};
+
+// Deletar um lançamento
+window.fbDeleteLancamento = async (uid, id) => {
+  try { await deleteDoc(userDoc(uid, "lancamentos", id)); } catch(e) { console.error("fbDeleteLancamento:", e); }
+};
+
+// Buscar todos os lançamentos do usuário
+window.fbGetLancamentos = async (uid) => {
+  try {
+    const snap = await getDocs(userCol(uid, "lancamentos"));
+    return snap.docs.map(d => d.data());
+  } catch(e) { console.error("fbGetLancamentos:", e); return []; }
+};
+
+// Salvar gasto fixo
+window.fbSaveFixo = async (uid, fixo) => {
+  try { await setDoc(userDoc(uid, "gastos_fixos", fixo.id), fixo); } catch(e) { console.error("fbSaveFixo:", e); }
+};
+
+// Deletar gasto fixo
+window.fbDeleteFixo = async (uid, id) => {
+  try { await deleteDoc(userDoc(uid, "gastos_fixos", id)); } catch(e) { console.error("fbDeleteFixo:", e); }
+};
+
+// Buscar gastos fixos
+window.fbGetFixos = async (uid) => {
+  try {
+    const snap = await getDocs(userCol(uid, "gastos_fixos"));
+    return snap.docs.map(d => d.data());
+  } catch(e) { console.error("fbGetFixos:", e); return []; }
+};
+
+// Salvar meta
+window.fbSaveMeta = async (uid, meta) => {
+  try { await setDoc(userDoc(uid, "metas", meta.id), meta); } catch(e) { console.error("fbSaveMeta:", e); }
+};
+
+// Deletar meta
+window.fbDeleteMeta = async (uid, id) => {
+  try { await deleteDoc(userDoc(uid, "metas", id)); } catch(e) { console.error("fbDeleteMeta:", e); }
+};
+
+// Buscar metas
+window.fbGetMetas = async (uid) => {
+  try {
+    const snap = await getDocs(userCol(uid, "metas"));
+    return snap.docs.map(d => d.data());
+  } catch(e) { console.error("fbGetMetas:", e); return []; }
+};
+
+// Salvar orçamentos
+window.fbSaveOrcamentos = async (uid, orcamentos) => {
+  try { await setDoc(userDoc(uid, "config", "orcamentos"), { data: orcamentos }); } catch(e) { console.error("fbSaveOrcamentos:", e); }
+};
+
+// Buscar orçamentos
+window.fbGetOrcamentos = async (uid) => {
+  try {
+    const snap = await getDoc(userDoc(uid, "config", "orcamentos"));
+    return snap.exists() ? snap.data().data : null;
+  } catch(e) { console.error("fbGetOrcamentos:", e); return null; }
+};
+
+// Carregar TODOS os dados do usuário de uma vez
+window.fbCarregarDados = async (uid) => {
+  try {
+    const [lanc, fixos, metas, orc] = await Promise.all([
+      window.fbGetLancamentos(uid),
+      window.fbGetFixos(uid),
+      window.fbGetMetas(uid),
+      window.fbGetOrcamentos(uid),
+    ]);
+    return { lancamentos: lanc, gastos_fixos: fixos, metas, orcamentos: orc };
+  } catch(e) { console.error("fbCarregarDados:", e); return null; }
+};
+
+// ========== AUTH ==========
+window.fbLogin = async (email, password) => {
+  if (!fbAuth) throw new Error("Firebase Auth não inicializado");
+  const cred = await signInWithEmailAndPassword(fbAuth, email, password);
+  const snap = await getDoc(doc(fbDB, "users", cred.user.uid));
+  if (snap.exists()) return snap.data();
+  // Criar perfil automaticamente (admin criado manualmente no console)
+  const ADMIN_EMAIL = "admin@financeflow.app";
+  const isAdmin = email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+  const profile = {
+    id: cred.user.uid, firebaseUid: cred.user.uid,
+    name: isAdmin ? "Admin" : email.split("@")[0],
+    email, role: isAdmin ? "admin" : "comum",
+    isAdmin, primeiroAcesso: false, status: "aprovado",
+    cadastradoEm: new Date().toISOString()
+  };
+  await setDoc(doc(fbDB, "users", cred.user.uid), profile);
+  return profile;
+};
+
+window.fbRegister = async (email, password, name) => {
+  const cred = await createUserWithEmailAndPassword(fbAuth, email, password);
+  const profile = {
+    id: cred.user.uid, firebaseUid: cred.user.uid,
+    name, email, role: "comum", isAdmin: false,
+    primeiroAcesso: true, status: "pendente",
+    cadastradoEm: new Date().toISOString()
+  };
+  await setDoc(doc(fbDB, "users", cred.user.uid), profile);
+  await signOut(fbAuth);
+  return profile;
+};
+
+window.fbSignInWithEmailLink = async (email, senha, nome) => {
+  const url = window.location.href;
+  let userCredential;
+  if (isSignInWithEmailLink(fbAuth, url)) {
+    userCredential = await signInWithEmailLink(fbAuth, email, url);
+  } else if (window._firebaseOobCode) {
+    const actionUrl = `https://financeflow-5bed5.firebaseapp.com/__/auth/action?mode=signIn&oobCode=${window._firebaseOobCode}&apiKey=AIzaSyDVnSgV4ZOJ-HdFjt7TCgR1it8W-WeTOxQ`;
+    userCredential = await signInWithEmailLink(fbAuth, email, actionUrl);
+  } else {
+    return await window.fbRegister(email, senha, nome);
+  }
+  await updatePassword(userCredential.user, senha);
+  const profile = {
+    id: userCredential.user.uid, firebaseUid: userCredential.user.uid,
+    name: nome, email, role: "comum", isAdmin: false,
+    primeiroAcesso: false, status: "pendente",
+    cadastradoEm: new Date().toISOString()
+  };
+  await setDoc(doc(fbDB, "users", userCredential.user.uid), profile);
+  await signOut(fbAuth);
+  return profile;
+};
+
+window.fbLogout = async () => { try { await signOut(fbAuth); } catch(e) {} };
+
+// Login com Google
+window.fbLoginGoogle = async () => {
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: 'select_account' });
+  const cred = await signInWithPopup(fbAuth, provider);
+  const user = cred.user;
+
+  // Verificar se já tem perfil no Firestore
+  const snap = await getDoc(doc(fbDB, "users", user.uid));
+  if (snap.exists()) {
+    return snap.data();
+  }
+
+  // Primeiro acesso com Google — criar perfil como pendente
+  const profile = {
+    id: user.uid,
+    firebaseUid: user.uid,
+    name: user.displayName || user.email.split('@')[0],
+    email: user.email,
+    avatar: user.photoURL || null,
+    role: 'comum',
+    isAdmin: false,
+    primeiroAcesso: false,
+    status: 'pendente',
+    cadastradoEm: new Date().toISOString(),
+    provider: 'google'
+  };
+  await setDoc(doc(fbDB, "users", user.uid), profile);
+  await signOut(fbAuth);
+  return profile;
+};
+
+window.fbResetPassword = async (email) => { await sendPasswordResetEmail(fbAuth, email); };
+
+window.fbChangePassword = async (senhaAtual, novaSenha) => {
+  const user = fbAuth.currentUser;
+  if (!user) throw new Error("Não autenticado");
+  const cred = EmailAuthProvider.credential(user.email, senhaAtual);
+  await reauthenticateWithCredential(user, cred);
+  await updatePassword(user, novaSenha);
+};
+
+window.fbCreateUserByAdmin = async (email, password, name) => {
+  const { initializeApp: initApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+  const secondApp = initApp(firebaseConfig, "secondary_" + Date.now());
+  const { getAuth: getAuth2, createUserWithEmailAndPassword: createUser2, signOut: signOut2 } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+  const secondAuth = getAuth2(secondApp);
+  try {
+    const cred = await createUser2(secondAuth, email, password);
+    const profile = {
+      id: cred.user.uid, firebaseUid: cred.user.uid,
+      name, email, role: "comum", isAdmin: false,
+      primeiroAcesso: true, status: "aprovado",
+      cadastradoEm: new Date().toISOString()
     };
+    await setDoc(doc(fbDB, "users", cred.user.uid), profile);
+    await signOut2(secondAuth);
+    return profile;
+  } finally { await secondApp.delete(); }
+};
 
-    const firebaseApp = initializeApp(firebaseConfig);
-    const fbDB = getFirestore(firebaseApp);
-    const fbAuth = getAuth(firebaseApp);
+window.fbSavePending = async (data) => {
+  try { await setDoc(doc(fbDB, "invites", data.id), data); } catch(e) { console.error(e); }
+};
 
-    // ========== HELPERS PATHS ==========
-    // Cada usuário tem sua própria subcolecão: users/{uid}/lancamentos, etc.
-    const userCol = (uid, col) => collection(fbDB, "users", uid, col);
-    const userDoc = (uid, col, id) => doc(fbDB, "users", uid, col, id);
+window.fbEnviarConvite = async (email, link) => {
+  const { sendSignInLinkToEmail } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+  const actionCodeSettings = { url: link, handleCodeInApp: true };
+  await sendSignInLinkToEmail(fbAuth, email, actionCodeSettings);
+  localStorage.setItem("ff_invite_email", email);
+};
 
-    // ========== USUÁRIOS ==========
-    window.fbSaveUser = async (user) => {
-      try { await setDoc(doc(fbDB, "users", user.id), user, { merge: true }); } catch (e) { console.error("fbSaveUser:", e); }
-    };
-    window.fbDeleteUser = async (userId) => {
-      try { await deleteDoc(doc(fbDB, "users", userId)); } catch (e) { console.error("fbDeleteUser:", e); }
-    };
-    window.fbGetUsers = async () => {
-      try {
-        const snap = await getDocs(collection(fbDB, "users"));
-        return snap.docs.map(d => d.data()).filter(u => u.email);
-      } catch (e) { console.error("fbGetUsers:", e); return []; }
-    };
-    window.fbListenUsers = (callback) => {
-      return onSnapshot(collection(fbDB, "users"), (snap) => {
-        callback(snap.docs.map(d => d.data()).filter(u => u.email));
-      });
-    };
-
-    // ========== DADOS DO USUÁRIO (isolados por uid) ==========
-
-    // Salvar um lançamento
-    window.fbSaveLancamento = async (uid, lancamento) => {
-      try { await setDoc(userDoc(uid, "lancamentos", lancamento.id), lancamento); } catch (e) { console.error("fbSaveLancamento:", e); }
-    };
-
-    // Deletar um lançamento
-    window.fbDeleteLancamento = async (uid, id) => {
-      try { await deleteDoc(userDoc(uid, "lancamentos", id)); } catch (e) { console.error("fbDeleteLancamento:", e); }
-    };
-
-    // Buscar todos os lançamentos do usuário
-    window.fbGetLancamentos = async (uid) => {
-      try {
-        const snap = await getDocs(userCol(uid, "lancamentos"));
-        return snap.docs.map(d => d.data());
-      } catch (e) { console.error("fbGetLancamentos:", e); return []; }
-    };
-
-    // Salvar gasto fixo
-    window.fbSaveFixo = async (uid, fixo) => {
-      try { await setDoc(userDoc(uid, "gastos_fixos", fixo.id), fixo); } catch (e) { console.error("fbSaveFixo:", e); }
-    };
-
-    // Deletar gasto fixo
-    window.fbDeleteFixo = async (uid, id) => {
-      try { await deleteDoc(userDoc(uid, "gastos_fixos", id)); } catch (e) { console.error("fbDeleteFixo:", e); }
-    };
-
-    // Buscar gastos fixos
-    window.fbGetFixos = async (uid) => {
-      try {
-        const snap = await getDocs(userCol(uid, "gastos_fixos"));
-        return snap.docs.map(d => d.data());
-      } catch (e) { console.error("fbGetFixos:", e); return []; }
-    };
-
-    // Salvar meta
-    window.fbSaveMeta = async (uid, meta) => {
-      try { await setDoc(userDoc(uid, "metas", meta.id), meta); } catch (e) { console.error("fbSaveMeta:", e); }
-    };
-
-    // Deletar meta
-    window.fbDeleteMeta = async (uid, id) => {
-      try { await deleteDoc(userDoc(uid, "metas", id)); } catch (e) { console.error("fbDeleteMeta:", e); }
-    };
-
-    // Buscar metas
-    window.fbGetMetas = async (uid) => {
-      try {
-        const snap = await getDocs(userCol(uid, "metas"));
-        return snap.docs.map(d => d.data());
-      } catch (e) { console.error("fbGetMetas:", e); return []; }
-    };
-
-    // Salvar orçamentos
-    window.fbSaveOrcamentos = async (uid, orcamentos) => {
-      try { await setDoc(userDoc(uid, "config", "orcamentos"), { data: orcamentos }); } catch (e) { console.error("fbSaveOrcamentos:", e); }
-    };
-
-    // Buscar orçamentos
-    window.fbGetOrcamentos = async (uid) => {
-      try {
-        const snap = await getDoc(userDoc(uid, "config", "orcamentos"));
-        return snap.exists() ? snap.data().data : null;
-      } catch (e) { console.error("fbGetOrcamentos:", e); return null; }
-    };
-
-    // Carregar TODOS os dados do usuário de uma vez
-    window.fbCarregarDados = async (uid) => {
-      try {
-        const [lanc, fixos, metas, orc] = await Promise.all([
-          window.fbGetLancamentos(uid),
-          window.fbGetFixos(uid),
-          window.fbGetMetas(uid),
-          window.fbGetOrcamentos(uid),
-        ]);
-        return { lancamentos: lanc, gastos_fixos: fixos, metas, orcamentos: orc };
-      } catch (e) { console.error("fbCarregarDados:", e); return null; }
-    };
-
-    // ========== AUTH ==========
-    window.fbLogin = async (email, password) => {
-      if (!fbAuth) throw new Error("Firebase Auth não inicializado");
-      const cred = await signInWithEmailAndPassword(fbAuth, email, password);
-      const snap = await getDoc(doc(fbDB, "users", cred.user.uid));
-      if (snap.exists()) return snap.data();
-      // Criar perfil automaticamente (admin criado manualmente no console)
-      const ADMIN_EMAIL = "admin@financeflow.app";
-      const isAdmin = email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
-      const profile = {
-        id: cred.user.uid, firebaseUid: cred.user.uid,
-        name: isAdmin ? "Admin" : email.split("@")[0],
-        email, role: isAdmin ? "admin" : "comum",
-        isAdmin, primeiroAcesso: false, status: "aprovado",
-        cadastradoEm: new Date().toISOString()
-      };
-      await setDoc(doc(fbDB, "users", cred.user.uid), profile);
-      return profile;
-    };
-
-    window.fbRegister = async (email, password, name) => {
-      const cred = await createUserWithEmailAndPassword(fbAuth, email, password);
-      const profile = {
-        id: cred.user.uid, firebaseUid: cred.user.uid,
-        name, email, role: "comum", isAdmin: false,
-        primeiroAcesso: true, status: "pendente",
-        cadastradoEm: new Date().toISOString()
-      };
-      await setDoc(doc(fbDB, "users", cred.user.uid), profile);
-      await signOut(fbAuth);
-      return profile;
-    };
-
-    window.fbSignInWithEmailLink = async (email, senha, nome) => {
-      const url = window.location.href;
-      let userCredential;
-      if (isSignInWithEmailLink(fbAuth, url)) {
-        userCredential = await signInWithEmailLink(fbAuth, email, url);
-      } else if (window._firebaseOobCode) {
-        const actionUrl = `https://financeflow-5bed5.firebaseapp.com/__/auth/action?mode=signIn&oobCode=${window._firebaseOobCode}&apiKey=AIzaSyDVnSgV4ZOJ-HdFjt7TCgR1it8W-WeTOxQ`;
-        userCredential = await signInWithEmailLink(fbAuth, email, actionUrl);
-      } else {
-        return await window.fbRegister(email, senha, nome);
-      }
-      await updatePassword(userCredential.user, senha);
-      const profile = {
-        id: userCredential.user.uid, firebaseUid: userCredential.user.uid,
-        name: nome, email, role: "comum", isAdmin: false,
-        primeiroAcesso: false, status: "pendente",
-        cadastradoEm: new Date().toISOString()
-      };
-      await setDoc(doc(fbDB, "users", userCredential.user.uid), profile);
-      await signOut(fbAuth);
-      return profile;
-    };
-
-    window.fbLogout = async () => { try { await signOut(fbAuth); } catch (e) { } };
-
-    window.fbResetPassword = async (email) => { await sendPasswordResetEmail(fbAuth, email); };
-
-    window.fbChangePassword = async (senhaAtual, novaSenha) => {
-      const user = fbAuth.currentUser;
-      if (!user) throw new Error("Não autenticado");
-      const cred = EmailAuthProvider.credential(user.email, senhaAtual);
-      await reauthenticateWithCredential(user, cred);
-      await updatePassword(user, novaSenha);
-    };
-
-    window.fbCreateUserByAdmin = async (email, password, name) => {
-      const { initializeApp: initApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
-      const secondApp = initApp(firebaseConfig, "secondary_" + Date.now());
-      const { getAuth: getAuth2, createUserWithEmailAndPassword: createUser2, signOut: signOut2 } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
-      const secondAuth = getAuth2(secondApp);
-      try {
-        const cred = await createUser2(secondAuth, email, password);
-        const profile = {
-          id: cred.user.uid, firebaseUid: cred.user.uid,
-          name, email, role: "comum", isAdmin: false,
-          primeiroAcesso: true, status: "aprovado",
-          cadastradoEm: new Date().toISOString()
-        };
-        await setDoc(doc(fbDB, "users", cred.user.uid), profile);
-        await signOut2(secondAuth);
-        return profile;
-      } finally { await secondApp.delete(); }
-    };
-
-    window.fbSavePending = async (data) => {
-      try { await setDoc(doc(fbDB, "invites", data.id), data); } catch (e) { console.error(e); }
-    };
-
-    window.fbEnviarConvite = async (email, link) => {
-      const { sendSignInLinkToEmail } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
-      const actionCodeSettings = { url: link, handleCodeInApp: true };
-      await sendSignInLinkToEmail(fbAuth, email, actionCodeSettings);
-      localStorage.setItem("ff_invite_email", email);
-    };
-
-    window.firebaseReady = true;
-    window.dispatchEvent(new Event("firebaseReady"));
-  </script>
+window.firebaseReady = true;
+window.dispatchEvent(new Event("firebaseReady"));
+</script>
 </body>
 
 </html>

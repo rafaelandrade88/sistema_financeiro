@@ -1908,14 +1908,7 @@
             ☰
             <span class="qnav-version">v1.0</span>
           </div>
-          <select class="period-selector" id="period-sel" onchange="refreshCharts()">
-            <option value="jan">Janeiro 2025</option>
-            <option value="feb">Fevereiro 2025</option>
-            <option value="mar">Março 2025</option>
-            <option value="apr">Abril 2025</option>
-            <option value="may" selected>Maio 2025</option>
-            <option value="jun">Junho 2025</option>
-          </select>
+          <select class="period-selector" id="period-sel" onchange="refreshCharts()"></select>
           <button class="topbar-btn" onclick="openModal('modal-lancamento')">+ Lançamento</button>
         </div>
       </div>
@@ -1940,7 +1933,7 @@
             <div style="font-family:var(--font-display);font-size:18px;font-weight:700;margin-bottom:4px" id="hero-pct">
               0% utilizado</div>
             <div style="font-size:13px;color:var(--text-2)">Ainda resta <strong id="hero-resta"
-                style="color:var(--accent)">R$ 0</strong> no orçamento de maio</div>
+                style="color:var(--accent)">R$ 0</strong> no orçamento de <span id="hero-mes-label">—</span></div>
           </div>
 
           <!-- KPIs -->
@@ -3165,11 +3158,6 @@
       }
     }
 
-    function validarEmail(email) {
-      const re = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
-      return re.test(email);
-    }
-
     /* ===============================
        QUICK NAV MENU
     ================================ */
@@ -3287,23 +3275,6 @@
     function marcarConfigurado() {
       DB.configurado = true;
       saveDB(DB);
-    }
-
-    // Máscara de valor monetário
-    function mascaraValor(input) {
-      let v = input.value.replace(/[^\d,]/g, '');
-      input.value = v;
-    }
-
-    // Parsear valor no formato BR (1.234,56) ou US (1234.56)
-    function parseValor(str) {
-      if (!str) return 0;
-      str = String(str).trim();
-      // Formato BR: 1.234,56
-      if (str.includes(',')) {
-        str = str.replace(/\./g, '').replace(',', '.');
-      }
-      return parseFloat(str) || 0;
     }
 
     /* ===============================
@@ -3343,19 +3314,49 @@
       return `${day}/${m}/${y}`;
     }
 
+    // Parseia 'YYYY-MM-DD' como data LOCAL (evita o bug de fuso horário de new Date(string))
+    function parseLocalDate(d) {
+      if (!d) return null;
+      const [y, m, day] = d.split('-').map(Number);
+      return new Date(y, m - 1, day);
+    }
+
+    // Popula o seletor de período com os últimos N meses a partir do mês atual
+    function populatePeriodSelector() {
+      const sel = document.getElementById('period-sel');
+      if (!sel) return;
+      const MONTH_NAMES = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+      const now = new Date();
+      const opts = [];
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        opts.push({ value: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`, label: `${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}` });
+      }
+      sel.innerHTML = opts.map(o => `<option value="${o.value}">${o.label}</option>`).join('');
+      sel.value = opts[opts.length - 1].value; // mês atual
+    }
+
     function currentMonth() {
       const sel = document.getElementById('period-sel');
-      if (!sel) return 4;
-      const opts = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
-      return opts.indexOf(sel.value);
+      if (!sel || !sel.value) return new Date().getMonth();
+      const [, m] = sel.value.split('-');
+      return parseInt(m, 10) - 1;
+    }
+
+    function currentYear() {
+      const sel = document.getElementById('period-sel');
+      if (!sel || !sel.value) return new Date().getFullYear();
+      const [y] = sel.value.split('-');
+      return parseInt(y, 10);
     }
 
     function getLancamentosMes() {
       const m = currentMonth();
+      const y = currentYear();
       return DB.lancamentos.filter(l => {
         if (!l.data) return false;
-        const lm = new Date(l.data).getMonth();
-        return lm === m;
+        const ld = parseLocalDate(l.data);
+        return ld.getMonth() === m && ld.getFullYear() === y;
       });
     }
 
@@ -3391,12 +3392,6 @@
       if (!input) return;
       input.type = input.type === 'password' ? 'text' : 'password';
       btn.textContent = input.type === 'password' ? '👁️' : '🙈';
-    }
-
-    // Validar e-mail
-    function validarEmail(email) {
-      const re = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
-      return re.test(email);
     }
 
     /* ===============================
@@ -3516,23 +3511,6 @@
     function marcarConfigurado() {
       DB.configurado = true;
       saveDB(DB);
-    }
-
-    // Máscara de valor monetário
-    function mascaraValor(input) {
-      let v = input.value.replace(/[^\d,]/g, '');
-      input.value = v;
-    }
-
-    // Parsear valor no formato BR (1.234,56) ou US (1234.56)
-    function parseValor(str) {
-      if (!str) return 0;
-      str = String(str).trim();
-      // Formato BR: 1.234,56
-      if (str.includes(',')) {
-        str = str.replace(/\./g, '').replace(',', '.');
-      }
-      return parseFloat(str) || 0;
     }
 
     // Detectar link de cadastro na URL (?mode=cadastro&email=xxx)
@@ -3716,8 +3694,14 @@
         let profile;
 
         if (window.fbLogin) {
-          // Login via Firebase Auth
-          profile = await window.fbLogin(email, pass);
+          // Login via Firebase Auth, com fallback para conta local se o Firebase rejeitar
+          try {
+            profile = await window.fbLogin(email, pass);
+          } catch (fbErr) {
+            const localProfile = DB.users.find(u => u.email === email && u.pass === hashPass(pass));
+            if (!localProfile) throw fbErr;
+            profile = localProfile;
+          }
         } else {
           // Fallback local
           profile = DB.users.find(u => u.email === email && u.pass === hashPass(pass));
@@ -3879,6 +3863,7 @@
       }
 
       populateCatSelects();
+      populatePeriodSelector();
       initSidebarOpen();
       atualizarBadgePendentes();
       navigate('visao-geral');
@@ -4008,6 +3993,11 @@
       document.getElementById('hero-orcamento').textContent = fmt(totalOrc);
       document.getElementById('hero-pct').textContent = temOrcamento ? `${pct}% utilizado` : 'Orçamento não configurado';
       document.getElementById('hero-resta').textContent = temOrcamento ? fmt(resta) : '—';
+      const mesLabelEl = document.getElementById('hero-mes-label');
+      if (mesLabelEl) {
+        const selOpt = document.getElementById('period-sel')?.selectedOptions?.[0];
+        mesLabelEl.textContent = selOpt ? selOpt.textContent : '';
+      }
 
       document.getElementById('kpi-saldo').textContent = fmt(saldo);
       document.getElementById('kpi-receitas').textContent = fmt(totalRec);
@@ -4055,7 +4045,7 @@
         months6.push(MN[d.getMonth()]);
         const lm = DB.lancamentos.filter(l => {
           if (!l.data) return false;
-          const ld = new Date(l.data);
+          const ld = parseLocalDate(l.data);
           return ld.getMonth() === d.getMonth() && ld.getFullYear() === d.getFullYear();
         });
         recData.push(sum(getReceitas(lm)));
@@ -4117,7 +4107,7 @@
       }
 
       // Recent transactions
-      const recent = [...list].sort((a, b) => new Date(b.data) - new Date(a.data)).slice(0, 8);
+      const recent = [...list].sort((a, b) => parseLocalDate(b.data) - parseLocalDate(a.data)).slice(0, 8);
       const tbody = document.getElementById('recent-tbody');
       if (tbody) {
         tbody.innerHTML = recent.length ? recent.map(l => txRow(l)).join('') : emptyRow(6);
@@ -4239,7 +4229,7 @@
         months.push(MONTH_NAMES[m]);
         const lancMes = DB.lancamentos.filter(l => {
           if (!l.data) return false;
-          const ld = new Date(l.data);
+          const ld = parseLocalDate(l.data);
           return ld.getMonth() === m && ld.getFullYear() === y;
         });
         rec.push(sum(getReceitas(lancMes)));
@@ -4438,7 +4428,7 @@
 
       const tbody = document.getElementById('efet-tbody');
       if (tbody) {
-        tbody.innerHTML = list.length ? list.sort((a, b) => new Date(b.data) - new Date(a.data)).map(l => `
+        tbody.innerHTML = list.length ? list.sort((a, b) => parseLocalDate(b.data) - parseLocalDate(a.data)).map(l => `
       <tr>
         <td>${fmtDate(l.data)}</td>
         <td style="color:var(--text-1)">${l.desc}</td>
@@ -4567,7 +4557,7 @@
 
       const tbody = document.getElementById('var-tbody');
       if (tbody) {
-        const sorted = [...list].sort((a, b) => new Date(b.data) - new Date(a.data));
+        const sorted = [...list].sort((a, b) => parseLocalDate(b.data) - parseLocalDate(a.data));
         tbody.innerHTML = sorted.length ? sorted.map(l => {
           const c = CATS[l.cat] || { label: l.cat, icon: '📦', color: '#999' };
           const f = FORMAS[l.forma] || { label: l.forma, icon: '💰' };
@@ -4783,7 +4773,7 @@
       if (filterTipo) list = list.filter(l => l.tipo === filterTipo);
       if (filterCat) list = list.filter(l => l.cat === filterCat);
       if (filterStatus) list = list.filter(l => l.status === filterStatus);
-      list.sort((a, b) => new Date(b.data) - new Date(a.data));
+      list.sort((a, b) => parseLocalDate(b.data) - parseLocalDate(a.data));
 
       const tbody = document.getElementById('lanc-tbody');
       if (tbody) {

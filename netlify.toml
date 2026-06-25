@@ -1,0 +1,13 @@
+# netlify.toml - FinanceFlow
+# --------------------------
+# O Netlify le este arquivo automaticamente ao importar o repositorio.
+# A cada push na branch main, ele executa "node build.js" antes de publicar.
+# As chaves Firebase sao injetadas via Environment Variables configuradas
+# no painel do Netlify — nunca ficam no codigo ou no Git.
+
+[build]
+  command     = "node build.js"
+  publish     = "dist"
+
+[build.environment]
+  NODE_VERSION = "18"

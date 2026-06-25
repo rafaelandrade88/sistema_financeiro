@@ -1,0 +1,20 @@
+# Variaveis de ambiente — NUNCA commitar
+.env
+.env.local
+.env.production
+
+# Pasta de build gerada pelo Netlify localmente (se rodar build.js na sua maquina)
+dist/
+
+# Dependencias Node (caso instale algo no futuro)
+node_modules/
+
+# Sistemas operacionais
+.DS_Store
+Thumbs.db
+
+# Editores
+.vscode/
+.idea/
+*.swp
+*.swo

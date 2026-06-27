@@ -1914,7 +1914,6 @@
           <div class="nav-sub-item" onclick="navigate('evolucao')">Evolução Mensal</div>
           <div class="nav-sub-item" onclick="navigate('categorias')">Categorias</div>
           <div class="nav-sub-item" onclick="navigate('transporte')">Transporte</div>
-          <div class="nav-sub-item" onclick="navigate('cartao')">Cartão / Parceiros</div>
           <div class="nav-sub-item" onclick="navigate('formas-pagamento')">Formas de Pagamento</div>
           <div class="nav-sub-item" onclick="navigate('efetivados')">Efetivados / Pendentes</div>
           <div class="nav-sub-item" onclick="navigate('gastos-fixos')">Gastos Fixos Mensais</div>
@@ -1946,6 +1945,19 @@
           <span class="nav-icon">🏷️</span>
           <span>Nova Categoria</span>
         </div>
+        <!-- GERENCIAR CARTÕES -->
+        <div class="nav-section-label" style="margin-top:8px">Cartões</div>
+        <div class="nav-item nav-parent" onclick="toggleNav(this,'sub-cartoes')">
+          <span class="nav-icon">💳</span>
+          <span>Gerenciar Cartões</span>
+          <span class="nav-arrow">▾</span>
+        </div>
+        <div class="nav-sub" id="sub-cartoes">
+          <div class="nav-sub-item" onclick="navigate('meus-cartoes')">Meus Cartões</div>
+          <div class="nav-sub-item" onclick="navigate('cart-lancamentos')">Lançamentos do Cartão</div>
+          <div class="nav-sub-item" onclick="navigate('cart-fatura')">Fatura</div>
+        </div>
+
         <div class="nav-item nav-parent" onclick="toggleNav(this,'sub-config')">
           <span class="nav-icon">⚙️</span>
           <span>Configurações</span>
@@ -2186,39 +2198,76 @@
           </div>
         </section>
 
-        <!-- ===================== CARTÃO / PARCEIROS ===================== -->
-        <section class="section" id="sec-cartao">
-          <div class="kpi-grid" style="margin-bottom:16px">
-            <div class="kpi-card accent-purple">
-              <div class="kpi-label">💳 Total Cartão Crédito</div>
-              <div class="kpi-value" id="cart-total">R$ 0</div>
-              <div class="kpi-change down">Este mês</div>
+        <!-- ===================== MEUS CARTÕES ===================== -->
+        <section class="section" id="sec-meus-cartoes">
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
+              <span>💳 Meus Cartões</span>
+              <button class="btn btn-accent" onclick="openModal('modal-card')">+ Adicionar Cartão</button>
             </div>
-            <div class="kpi-card accent-yellow">
-              <div class="kpi-label">🔄 Parcelas em Aberto</div>
-              <div class="kpi-value" id="cart-parcelas">0x</div>
-              <div class="kpi-change" style="color:var(--text-2)">em aberto</div>
-            </div>
-            <div class="kpi-card accent-red">
-              <div class="kpi-label">💰 Total Parcelas</div>
-              <div class="kpi-value" id="cart-total-parc">R$ 0</div>
-              <div class="kpi-change" style="color:var(--text-2)">valor parcelado</div>
-            </div>
+            <div id="cards-list" style="margin-top:12px"></div>
           </div>
-          <div class="card">
-            <div class="card-title">💳 Compras Parceladas</div>
+        </section>
+
+        <!-- ===================== LANÇAMENTOS DO CARTÃO ===================== -->
+        <section class="section" id="sec-cart-lancamentos">
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
+              <span>🧾 Lançamentos do Cartão</span>
+              <button class="btn btn-accent" onclick="openModal('modal-card-transacao')">+ Novo Lançamento</button>
+            </div>
+            <div class="form-row" style="margin:12px 0">
+              <div class="field">
+                <label>Cartão</label>
+                <select id="filter-card-sel" onchange="renderCartLancamentos()"></select>
+              </div>
+              <div class="field">
+                <label>Mês</label>
+                <select id="filter-card-mes" onchange="renderCartLancamentos()"></select>
+              </div>
+            </div>
             <table class="data-table">
               <thead>
                 <tr>
+                  <th>Data</th>
                   <th>Descrição</th>
+                  <th>Categoria</th>
                   <th>Parcela</th>
-                  <th>Valor Parcela</th>
-                  <th>Total</th>
-                  <th>Vence</th>
-                  <th>Status</th>
+                  <th style="text-align:right">Valor</th>
+                  <th>Ações</th>
                 </tr>
               </thead>
-              <tbody id="cart-tbody"></tbody>
+              <tbody id="cart-lanc-tbody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ===================== FATURA DO CARTÃO ===================== -->
+        <section class="section" id="sec-cart-fatura">
+          <div class="card">
+            <div class="card-title">📄 Fatura do Cartão</div>
+            <div class="form-row" style="margin:12px 0">
+              <div class="field">
+                <label>Cartão</label>
+                <select id="filter-fatura-card" onchange="renderCartFatura()"></select>
+              </div>
+              <div class="field">
+                <label>Mês</label>
+                <select id="filter-fatura-mes" onchange="renderCartFatura()"></select>
+              </div>
+            </div>
+            <div id="fatura-kpis" class="kpi-grid" style="margin-bottom:16px"></div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Descrição</th>
+                  <th>Categoria</th>
+                  <th>Parcela</th>
+                  <th style="text-align:right">Valor</th>
+                </tr>
+              </thead>
+              <tbody id="fatura-tbody"></tbody>
             </table>
           </div>
         </section>
@@ -2627,7 +2676,6 @@
           <label>Forma de Pagamento</label>
           <select id="lanc-forma">
             <option value="pix">PIX</option>
-            <option value="credito">Cartão Crédito</option>
             <option value="debito">Cartão Débito</option>
             <option value="dinheiro">Dinheiro</option>
             <option value="boleto">Boleto</option>
@@ -2640,19 +2688,6 @@
             <option value="efetivado">Efetivado</option>
             <option value="pendente">Pendente</option>
           </select>
-        </div>
-      </div>
-
-      <div id="parcela-field" style="display:none">
-        <div class="form-row">
-          <div class="field">
-            <label>Parcela Atual</label>
-            <input type="number" id="lanc-parc-atual" value="1" min="1">
-          </div>
-          <div class="field">
-            <label>Total de Parcelas</label>
-            <input type="number" id="lanc-parc-total" value="12" min="1">
-          </div>
         </div>
       </div>
 
@@ -2897,6 +2932,93 @@
     </div>
   </div>
 
+  <!-- MODAL: NOVO / EDITAR CARTÃO -->
+  <div class="modal-overlay" id="modal-card">
+    <div class="modal" style="max-width:440px">
+      <div class="modal-title">💳 Novo Cartão</div>
+      <div class="modal-sub">Cadastre um cartão de crédito para controlar sua fatura</div>
+      <input type="hidden" id="card-id">
+      <div class="form-row form-row-1">
+        <div class="field">
+          <label>Nome do Cartão</label>
+          <input type="text" id="card-nome" placeholder="Ex: Nubank Roxinho" maxlength="40">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Bandeira</label>
+          <select id="card-bandeira">
+            <option value="Visa">Visa</option>
+            <option value="Mastercard">Mastercard</option>
+            <option value="Elo">Elo</option>
+            <option value="Amex">American Express</option>
+            <option value="Hipercard">Hipercard</option>
+            <option value="Outro">Outro</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Limite (R$)</label>
+          <input type="text" id="card-limite" placeholder="0,00" inputmode="decimal" oninput="mascaraValor(this)">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeModal('modal-card')">Cancelar</button>
+        <button class="btn btn-accent" onclick="salvarCard()">Salvar Cartão</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: NOVO / EDITAR LANÇAMENTO DO CARTÃO -->
+  <div class="modal-overlay" id="modal-card-transacao">
+    <div class="modal" style="max-width:480px">
+      <div class="modal-title" id="modal-card-transacao-title">🧾 Novo Lançamento no Cartão</div>
+      <div class="modal-sub">Registre uma compra ou despesa no cartão</div>
+      <input type="hidden" id="ctransacao-id">
+      <div class="form-row form-row-1">
+        <div class="field">
+          <label>Cartão</label>
+          <select id="ctransacao-card"></select>
+        </div>
+      </div>
+      <div class="form-row form-row-1">
+        <div class="field">
+          <label>Descrição</label>
+          <input type="text" id="ctransacao-desc" placeholder="Ex: Supermercado, Netflix..." maxlength="80">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Valor (R$)</label>
+          <input type="text" id="ctransacao-valor" placeholder="0,00" inputmode="decimal" oninput="mascaraValor(this)">
+        </div>
+        <div class="field">
+          <label>Data</label>
+          <input type="date" id="ctransacao-data">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Categoria</label>
+          <select id="ctransacao-cat"></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Parcelas</label>
+          <input type="number" id="ctransacao-parcelas" value="1" min="1" max="48">
+        </div>
+        <div class="field">
+          <label>Parcela Nº</label>
+          <input type="number" id="ctransacao-parcela-num" value="1" min="1" max="48">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeModal('modal-card-transacao')">Cancelar</button>
+        <button class="btn btn-accent" onclick="salvarCardTransacao()">Salvar Lançamento</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: NOVA CATEGORIA (Ajuste 4) -->
   <div class="modal-overlay" id="modal-categoria">
     <div class="modal" style="max-width:440px">
@@ -3046,6 +3168,8 @@
         rendaMensal: 0,
         configurado: false,
         categorias: [],
+        cards: [],
+        cardTransactions: [],
         theme: 'dark'
       };
       saveDB(db);
@@ -3715,6 +3839,8 @@
             DB.gastos_fixos = dados.gastos_fixos || [];
             DB.metas = dados.metas || [];
             if (dados.orcamentos) DB.orcamentos = dados.orcamentos;
+            DB.cards = dados.cards || [];
+            DB.cardTransactions = dados.cardTransactions || [];
             saveDB(DB);
           }
         } catch (e) {
@@ -3748,7 +3874,9 @@
       'evolucao': 'Evolução Mensal',
       'categorias': 'Categorias',
       'transporte': 'Transporte',
-      'cartao': 'Cartão / Parceiros',
+      'meus-cartoes': 'Meus Cartões',
+      'cart-lancamentos': 'Lançamentos do Cartão',
+      'cart-fatura': 'Fatura do Cartão',
       'formas-pagamento': 'Formas de Pagamento',
       'efetivados': 'Efetivados / Pendentes',
       'gastos-fixos': 'Gastos Fixos Mensais',
@@ -3808,7 +3936,9 @@
         case 'evolucao': renderEvolucao(); break;
         case 'categorias': renderCategorias(); break;
         case 'transporte': renderTransporte(); break;
-        case 'cartao': renderCartao(); break;
+        case 'meus-cartoes': renderMeusCartoes(); break;
+        case 'cart-lancamentos': renderCartLancamentos(); break;
+        case 'cart-fatura': renderCartFatura(); break;
         case 'formas-pagamento': renderFormasPagamento(); break;
         case 'efetivados': renderEfetivados(); break;
         case 'gastos-fixos': renderGastosFixos(); break;
@@ -4260,28 +4390,216 @@
     }
 
     /* ===============================
-       CARTÃO / PARCEIROS
+       GERENCIAR CARTÕES
     ================================ */
-    function renderCartao() {
-      const list = getDespesas(getLancamentosMes()).filter(l => l.forma === 'credito');
-      const parceladas = list.filter(l => l.parc);
-      document.getElementById('cart-total').textContent = fmt(sum(list));
-      document.getElementById('cart-parcelas').textContent = parceladas.length + 'x';
-      document.getElementById('cart-total-parc').textContent = fmt(sum(parceladas));
-
-      const tbody = document.getElementById('cart-tbody');
-      if (tbody) {
-        tbody.innerHTML = parceladas.length ? parceladas.map(l => `
-      <tr>
-        <td style="color:var(--text-1)">${l.desc}</td>
-        <td>${l.parc.atual}/${l.parc.total}</td>
-        <td>${fmt(l.valor)}</td>
-        <td>${fmt(l.valor * l.parc.total)}</td>
-        <td>${fmtDate(l.data)}</td>
-        <td><span class="badge badge-${l.status === 'efetivado' ? 'success' : 'warning'}">${l.status === 'efetivado' ? '✅ Pago' : '⏳ Pendente'}</span></td>
-      </tr>
-    `).join('') : `<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-3)">Nenhuma compra parcelada</td></tr>`;
+    function renderMeusCartoes() {
+      const cards = DB.cards || [];
+      const el = document.getElementById('cards-list');
+      if (!el) return;
+      if (cards.length === 0) {
+        el.innerHTML = `<div style="text-align:center;padding:32px;color:var(--text-3)">Nenhum cartão cadastrado. Clique em <strong>+ Adicionar Cartão</strong> para começar.</div>`;
+        return;
       }
+      el.innerHTML = cards.filter(c => c.active !== false).map(c => `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border)">
+          <div>
+            <div style="font-weight:600;color:var(--text-1)">💳 ${c.name}</div>
+            <div style="font-size:12px;color:var(--text-3);margin-top:2px">${c.brand} · Limite: ${fmt(c.limit)}</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-outline" style="padding:6px 12px;font-size:12px" onclick="editarCard('${c.id}')">✏️ Editar</button>
+            <button class="btn" style="padding:6px 12px;font-size:12px;background:var(--danger);color:#fff;border:none" onclick="excluirCard('${c.id}')">🗑️</button>
+          </div>
+        </div>`).join('');
+    }
+
+    function salvarCard() {
+      const id = document.getElementById('card-id').value || uid();
+      const nome = document.getElementById('card-nome').value.trim();
+      const bandeira = document.getElementById('card-bandeira').value;
+      const limite = parseValor(document.getElementById('card-limite').value);
+      if (!nome) { showNotif('Informe o nome do cartão', '⚠️'); return; }
+      const existing = (DB.cards || []).find(c => c.id === id);
+      const card = { id, name: nome, brand: bandeira, limit: limite || 0, active: true };
+      if (existing) {
+        DB.cards = DB.cards.map(c => c.id === id ? card : c);
+      } else {
+        if (!DB.cards) DB.cards = [];
+        DB.cards.push(card);
+      }
+      saveDB(DB);
+      if (window.fbSaveCard && DB.currentUser?.id) window.fbSaveCard(DB.currentUser.id, card);
+      closeModal('modal-card');
+      showNotif('Cartão salvo! 💳', '✅');
+      renderMeusCartoes();
+    }
+
+    function editarCard(id) {
+      const c = (DB.cards || []).find(c => c.id === id);
+      if (!c) return;
+      document.getElementById('card-id').value = c.id;
+      document.getElementById('card-nome').value = c.name;
+      document.getElementById('card-bandeira').value = c.brand;
+      document.getElementById('card-limite').value = c.limit ? c.limit.toFixed(2).replace('.', ',') : '';
+      document.querySelector('#modal-card .modal-title').textContent = '✏️ Editar Cartão';
+      openModal('modal-card');
+    }
+
+    function excluirCard(id) {
+      if (!confirm('Excluir este cartão? Os lançamentos associados não serão removidos.')) return;
+      DB.cards = (DB.cards || []).filter(c => c.id !== id);
+      saveDB(DB);
+      if (window.fbDeleteCard && DB.currentUser?.id) window.fbDeleteCard(DB.currentUser.id, id);
+      showNotif('Cartão excluído', '🗑️');
+      renderMeusCartoes();
+    }
+
+    function _buildCardMesOptions(selId, onChange) {
+      const sel = document.getElementById(selId);
+      if (!sel) return;
+      const months = new Set();
+      (DB.cardTransactions || []).forEach(t => { if (t.date) months.add(t.date.slice(0, 7)); });
+      const now = new Date();
+      const cur = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      months.add(cur);
+      const sorted = [...months].sort().reverse();
+      sel.innerHTML = sorted.map(m => `<option value="${m}"${m === cur ? ' selected' : ''}>${m}</option>`).join('');
+      if (onChange) sel.onchange = onChange;
+    }
+
+    function _buildCardSelOptions(selId, all) {
+      const sel = document.getElementById(selId);
+      if (!sel) return;
+      const cards = (DB.cards || []).filter(c => c.active !== false);
+      const allOpt = all ? `<option value="">Todos os cartões</option>` : '';
+      sel.innerHTML = allOpt + cards.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+      if (!all && cards.length > 0) sel.value = cards[0].id;
+    }
+
+    function renderCartLancamentos() {
+      _buildCardSelOptions('filter-card-sel', true);
+      _buildCardMesOptions('filter-card-mes', renderCartLancamentos);
+      const cardId = document.getElementById('filter-card-sel')?.value || '';
+      const mes = document.getElementById('filter-card-mes')?.value || '';
+      const txs = (DB.cardTransactions || []).filter(t => {
+        const matchCard = !cardId || t.cardId === cardId;
+        const matchMes = !mes || (t.date || '').startsWith(mes);
+        return matchCard && matchMes;
+      }).sort((a, b) => (b.date || '') < (a.date || '') ? -1 : 1);
+      const tbody = document.getElementById('cart-lanc-tbody');
+      if (!tbody) return;
+      tbody.innerHTML = txs.length ? txs.map(t => {
+        const cat = CATS[t.category] || { label: t.category || '—', icon: '📦' };
+        const parc = t.installments > 1 ? `${t.installmentNumber}/${t.installments}` : '—';
+        return `<tr>
+          <td>${fmtDate(t.date)}</td>
+          <td style="color:var(--text-1)">${t.description}</td>
+          <td>${cat.icon} ${cat.label}</td>
+          <td>${parc}</td>
+          <td style="text-align:right;color:var(--danger);font-weight:600">−${fmt(t.amount)}</td>
+          <td>
+            <button class="btn btn-outline" style="padding:4px 8px;font-size:11px" onclick="editarCardTransacao('${t.id}')">✏️</button>
+            <button class="btn" style="padding:4px 8px;font-size:11px;background:var(--danger);color:#fff;border:none;margin-left:4px" onclick="excluirCardTransacao('${t.id}')">🗑️</button>
+          </td>
+        </tr>`;
+      }).join('') : `<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-3)">Nenhum lançamento encontrado</td></tr>`;
+    }
+
+    function renderCartFatura() {
+      _buildCardSelOptions('filter-fatura-card', false);
+      _buildCardMesOptions('filter-fatura-mes', renderCartFatura);
+      const cardId = document.getElementById('filter-fatura-card')?.value || '';
+      const mes = document.getElementById('filter-fatura-mes')?.value || '';
+      const txs = (DB.cardTransactions || []).filter(t =>
+        (!cardId || t.cardId === cardId) && (!mes || (t.date || '').startsWith(mes))
+      ).sort((a, b) => (a.date || '') > (b.date || '') ? 1 : -1);
+      const total = txs.reduce((s, t) => s + (t.amount || 0), 0);
+      const card = (DB.cards || []).find(c => c.id === cardId);
+      const limit = card?.limit || 0;
+      const pct = limit > 0 ? Math.min(100, (total / limit * 100)).toFixed(0) : 0;
+
+      const kpis = document.getElementById('fatura-kpis');
+      if (kpis) kpis.innerHTML = `
+        <div class="kpi-card accent-purple">
+          <div class="kpi-label">💳 Total da Fatura</div>
+          <div class="kpi-value">${fmt(total)}</div>
+          <div class="kpi-change down">${txs.length} lançamento(s)</div>
+        </div>
+        <div class="kpi-card accent-yellow">
+          <div class="kpi-label">📊 Limite Usado</div>
+          <div class="kpi-value">${pct}%</div>
+          <div class="kpi-change" style="color:var(--text-2)">de ${fmt(limit)}</div>
+        </div>
+        <div class="kpi-card accent-green">
+          <div class="kpi-label">✅ Limite Disponível</div>
+          <div class="kpi-value">${fmt(Math.max(0, limit - total))}</div>
+          <div class="kpi-change" style="color:var(--text-2)">restante</div>
+        </div>`;
+
+      const tbody = document.getElementById('fatura-tbody');
+      if (!tbody) return;
+      tbody.innerHTML = txs.length ? txs.map(t => {
+        const cat = CATS[t.category] || { label: t.category || '—', icon: '📦' };
+        const parc = t.installments > 1 ? `${t.installmentNumber}/${t.installments}` : '—';
+        return `<tr>
+          <td>${fmtDate(t.date)}</td>
+          <td style="color:var(--text-1)">${t.description}</td>
+          <td>${cat.icon} ${cat.label}</td>
+          <td>${parc}</td>
+          <td style="text-align:right;color:var(--danger);font-weight:600">−${fmt(t.amount)}</td>
+        </tr>`;
+      }).join('') : `<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text-3)">Nenhum lançamento nesta fatura</td></tr>`;
+    }
+
+    function salvarCardTransacao() {
+      const id = document.getElementById('ctransacao-id').value || uid();
+      const cardId = document.getElementById('ctransacao-card').value;
+      const desc = document.getElementById('ctransacao-desc').value.trim();
+      const valor = parseValor(document.getElementById('ctransacao-valor').value);
+      const data = document.getElementById('ctransacao-data').value;
+      const cat = document.getElementById('ctransacao-cat').value;
+      const parcelas = parseInt(document.getElementById('ctransacao-parcelas').value) || 1;
+      const parcelaNum = parseInt(document.getElementById('ctransacao-parcela-num').value) || 1;
+      if (!desc || !valor || !data || !cardId) { showNotif('Preencha todos os campos obrigatórios', '⚠️'); return; }
+      const tx = { id, cardId, description: desc, amount: valor, date: data, category: cat, installments: parcelas, installmentNumber: parcelaNum };
+      const existing = (DB.cardTransactions || []).find(t => t.id === id);
+      if (existing) {
+        DB.cardTransactions = DB.cardTransactions.map(t => t.id === id ? tx : t);
+      } else {
+        if (!DB.cardTransactions) DB.cardTransactions = [];
+        DB.cardTransactions.push(tx);
+      }
+      saveDB(DB);
+      if (window.fbSaveCardTransacao && DB.currentUser?.id) window.fbSaveCardTransacao(DB.currentUser.id, tx);
+      closeModal('modal-card-transacao');
+      showNotif('Lançamento salvo! 🧾', '✅');
+      renderCartLancamentos();
+    }
+
+    function editarCardTransacao(id) {
+      const t = (DB.cardTransactions || []).find(t => t.id === id);
+      if (!t) return;
+      _buildCardSelOptions('ctransacao-card', false);
+      _populateCatSelect('ctransacao-cat', 'despesa');
+      document.getElementById('ctransacao-id').value = t.id;
+      document.getElementById('ctransacao-card').value = t.cardId;
+      document.getElementById('ctransacao-desc').value = t.description;
+      document.getElementById('ctransacao-valor').value = t.amount ? t.amount.toFixed(2).replace('.', ',') : '';
+      document.getElementById('ctransacao-data').value = t.date;
+      document.getElementById('ctransacao-cat').value = t.category || '';
+      document.getElementById('ctransacao-parcelas').value = t.installments || 1;
+      document.getElementById('ctransacao-parcela-num').value = t.installmentNumber || 1;
+      document.getElementById('modal-card-transacao-title').textContent = '✏️ Editar Lançamento do Cartão';
+      document.getElementById('modal-card-transacao').classList.add('open');
+    }
+
+    function excluirCardTransacao(id) {
+      if (!confirm('Excluir este lançamento do cartão?')) return;
+      DB.cardTransactions = (DB.cardTransactions || []).filter(t => t.id !== id);
+      saveDB(DB);
+      if (window.fbDeleteCardTransacao && DB.currentUser?.id) window.fbDeleteCardTransacao(DB.currentUser.id, id);
+      showNotif('Lançamento excluído', '🗑️');
+      renderCartLancamentos();
     }
 
     /* ===============================
@@ -4895,10 +5213,26 @@
         if (forma) forma.value = 'pix';
         const status = document.getElementById('lanc-status');
         if (status) status.value = 'efetivado';
-        const parcField = document.getElementById('parcela-field');
-        if (parcField) parcField.style.display = 'none';
         const modalTitle = document.querySelector('#modal-lancamento .modal-title');
         if (modalTitle) modalTitle.textContent = '➕ Novo Lançamento';
+      }
+      if (id === 'modal-card') {
+        document.getElementById('card-id').value = '';
+        document.getElementById('card-nome').value = '';
+        document.getElementById('card-bandeira').value = 'Visa';
+        document.getElementById('card-limite').value = '';
+        document.querySelector('#modal-card .modal-title').textContent = '💳 Novo Cartão';
+      }
+      if (id === 'modal-card-transacao') {
+        document.getElementById('ctransacao-id').value = '';
+        document.getElementById('ctransacao-desc').value = '';
+        document.getElementById('ctransacao-valor').value = '';
+        document.getElementById('ctransacao-data').value = new Date().toISOString().split('T')[0];
+        document.getElementById('ctransacao-parcelas').value = 1;
+        document.getElementById('ctransacao-parcela-num').value = 1;
+        document.getElementById('modal-card-transacao-title').textContent = '🧾 Novo Lançamento no Cartão';
+        _buildCardSelOptions('ctransacao-card', false);
+        _populateCatSelect('ctransacao-cat', 'despesa');
       }
       if (id === 'modal-meta') {
         const d = document.getElementById('meta-prazo');
@@ -4918,11 +5252,7 @@
       m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
     });
 
-    function toggleTipo() {
-      const tipo = document.getElementById('lanc-tipo').value;
-      document.getElementById('parcela-field').style.display =
-        tipo === 'despesa' && document.getElementById('lanc-forma').value === 'credito' ? 'block' : 'none';
-    }
+    function toggleTipo() { /* parcela-field removido (Ajuste 13) */ }
 
     /* ===============================
        SALVAR LANÇAMENTO
@@ -4938,14 +5268,7 @@
 
       if (!data || !desc || !valor) { showNotif('Preencha todos os campos obrigatórios', '⚠️'); return; }
 
-      let parc = null;
-      if (forma === 'credito' && tipo === 'despesa') {
-        const pa = parseInt(document.getElementById('lanc-parc-atual').value) || 1;
-        const pt = parseInt(document.getElementById('lanc-parc-total').value) || 1;
-        if (pt > 1) parc = { atual: pa, total: pt };
-      }
-
-      const l = { id: uid(), data, desc, tipo, valor, cat, forma, status, parc };
+      const l = { id: uid(), data, desc, tipo, valor, cat, forma, status, parc: null };
       DB.lancamentos.push(l);
       saveDB(DB);
       // Sincronizar com Firebase
@@ -5118,8 +5441,27 @@
         });
       }
 
-      document.getElementById('lanc-forma')?.addEventListener('change', toggleTipo);
-      document.getElementById('lanc-tipo')?.addEventListener('change', toggleTipo);
+    }
+
+    // Popula um único select de categoria filtrando por tipo ('despesa'|'receita'|null=todos)
+    function _populateCatSelect(selId, tipo) {
+      const el = document.getElementById(selId);
+      if (!el) return;
+      el.innerHTML = '';
+      const customCats = DB.categorias || [];
+      Object.entries(CATS).forEach(([k, v]) => {
+        if (tipo === 'despesa' && k === 'receita') return;
+        if (tipo === 'receita' && k !== 'receita') return;
+        const opt = document.createElement('option');
+        opt.value = k; opt.textContent = v.icon + ' ' + v.label;
+        el.appendChild(opt);
+      });
+      customCats.forEach(c => {
+        if (tipo && c.tipo !== tipo) return;
+        const opt = document.createElement('option');
+        opt.value = c.id; opt.textContent = (c.icon || '📦') + ' ' + c.nome;
+        el.appendChild(opt);
+      });
     }
 
     /* ===============================
@@ -5476,16 +5818,44 @@
       } catch (e) { console.error("fbGetOrcamentos:", e); return null; }
     };
 
+    // ========== CARTÕES ==========
+    window.fbSaveCard = async (uid, card) => {
+      try { await setDoc(userDoc(uid, "cards", card.id), card); } catch (e) { console.error("fbSaveCard:", e); }
+    };
+    window.fbDeleteCard = async (uid, id) => {
+      try { await deleteDoc(userDoc(uid, "cards", id)); } catch (e) { console.error("fbDeleteCard:", e); }
+    };
+    window.fbGetCards = async (uid) => {
+      try {
+        const snap = await getDocs(userCol(uid, "cards"));
+        return snap.docs.map(d => d.data());
+      } catch (e) { console.error("fbGetCards:", e); return []; }
+    };
+    window.fbSaveCardTransacao = async (uid, tx) => {
+      try { await setDoc(userDoc(uid, "cardTransactions", tx.id), tx); } catch (e) { console.error("fbSaveCardTransacao:", e); }
+    };
+    window.fbDeleteCardTransacao = async (uid, id) => {
+      try { await deleteDoc(userDoc(uid, "cardTransactions", id)); } catch (e) { console.error("fbDeleteCardTransacao:", e); }
+    };
+    window.fbGetCardTransacoes = async (uid) => {
+      try {
+        const snap = await getDocs(userCol(uid, "cardTransactions"));
+        return snap.docs.map(d => d.data());
+      } catch (e) { console.error("fbGetCardTransacoes:", e); return []; }
+    };
+
     // Carregar TODOS os dados do usuário de uma vez
     window.fbCarregarDados = async (uid) => {
       try {
-        const [lanc, fixos, metas, orc] = await Promise.all([
+        const [lanc, fixos, metas, orc, cards, cardTransactions] = await Promise.all([
           window.fbGetLancamentos(uid),
           window.fbGetFixos(uid),
           window.fbGetMetas(uid),
           window.fbGetOrcamentos(uid),
+          window.fbGetCards(uid),
+          window.fbGetCardTransacoes(uid),
         ]);
-        return { lancamentos: lanc, gastos_fixos: fixos, metas, orcamentos: orc };
+        return { lancamentos: lanc, gastos_fixos: fixos, metas, orcamentos: orc, cards, cardTransactions };
       } catch (e) { console.error("fbCarregarDados:", e); return null; }
     };
 

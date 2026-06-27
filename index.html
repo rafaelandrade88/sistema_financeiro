@@ -1890,15 +1890,13 @@
         </div>
       </div>
 
-      <div class="sidebar-user" onclick="navigate('config-usuarios')">
-        <div class="user-avatar" id="user-avatar-nav">JD</div>
-        <div>
-          <div class="user-name" id="user-name-nav">João da Silva</div>
-          <div class="user-email" id="user-email-nav">joao@email.com</div>
-        </div>
-      </div>
-
       <div class="sidebar-nav">
+
+        <!-- HOME -->
+        <div class="nav-item" onclick="navigate('visao-geral')" style="margin-bottom:4px">
+          <span class="nav-icon">🏠</span>
+          <span>Home</span>
+        </div>
 
         <!-- ANÁLISE FINANCEIRA -->
         <div class="nav-section-label">Análise Financeira</div>
@@ -1937,13 +1935,14 @@
         <!-- DADOS -->
         <div class="nav-section-label" style="margin-top:8px">Dados</div>
 
-        <div class="nav-item" onclick="navigate('lancamentos')">
+        <div class="nav-item nav-parent" onclick="toggleNav(this,'sub-dados')">
           <span class="nav-icon">📋</span>
-          <span>Lançamentos</span>
+          <span>Dados</span>
+          <span class="nav-arrow">▾</span>
         </div>
-        <div class="nav-item" onclick="openModal('modal-categoria')">
-          <span class="nav-icon">🏷️</span>
-          <span>Nova Categoria</span>
+        <div class="nav-sub" id="sub-dados">
+          <div class="nav-sub-item" onclick="navigate('lancamentos')">Lançamentos</div>
+          <div class="nav-sub-item" onclick="openModal('modal-categoria');closeSidebar()">Nova Categoria</div>
         </div>
         <!-- GERENCIAR CARTÕES -->
         <div class="nav-section-label" style="margin-top:8px">Cartões</div>
@@ -1985,7 +1984,7 @@
         <div class="topbar-right">
           <div class="qnav-btn" onclick="openQNav()" title="Menu de Navegação">
             ☰
-            <span class="qnav-version">v1.0</span>
+            <span class="qnav-version">v1.5</span>
           </div>
           <select class="period-selector" id="period-sel" onchange="refreshCharts()"></select>
           <button class="topbar-btn" onclick="openModal('modal-lancamento')">+ Lançamento</button>
@@ -2605,7 +2604,7 @@
             <div style="display:flex;flex-direction:column;gap:20px;margin-top:8px">
               <div>
                 <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-                  <span style="font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--accent)">v1.0.0</span>
+                  <span style="font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--accent)">v1.5.0</span>
                   <span style="font-size:11px;color:var(--text-3);background:var(--bg-2);padding:2px 8px;border-radius:99px">Junho 2026</span>
                 </div>
                 <ul style="list-style:none;display:flex;flex-direction:column;gap:6px">
@@ -2820,7 +2819,7 @@
             <div style="font-size:12px;font-weight:600;color:var(--text-1)">FinanceFlow</div>
             <div style="font-size:11px;color:var(--text-3);margin-top:1px">Versão atual</div>
           </div>
-          <div style="font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--accent)">v1.0.0</div>
+          <div style="font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--accent)">v1.5.0</div>
         </div>
       </div>
 
@@ -3200,7 +3199,7 @@
     /* ===============================
        QUICK NAV MENU
     ================================ */
-    const APP_VERSION = 'v1.0.0';
+    const APP_VERSION = 'v1.5.0';
 
     function openQNav() {
       // Popular dados do usuário

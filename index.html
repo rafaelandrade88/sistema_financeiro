@@ -3813,10 +3813,13 @@
       // Mostrar loading
       document.getElementById('login-page').style.display = 'none';
       document.getElementById('app').classList.add('visible');
-      document.getElementById('user-name-nav').textContent = user.name;
-      document.getElementById('user-email-nav').textContent = user.email;
       const initials = user.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-      document.getElementById('user-avatar-nav').textContent = initials;
+      const elName = document.getElementById('user-name-nav');
+      const elEmail = document.getElementById('user-email-nav');
+      const elAvatar = document.getElementById('user-avatar-nav');
+      if (elName) elName.textContent = user.name;
+      if (elEmail) elEmail.textContent = user.email;
+      if (elAvatar) elAvatar.textContent = initials;
 
       // Aplicar tema salvo
       const th = document.getElementById('toggle-theme');
